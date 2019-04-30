@@ -43,6 +43,7 @@ public class CodeUtility {
     //public static String baseURL = "http://192.168.1.18:5000";
   // public static String baseURL = "http://10.171.152.230:5000";
     public static String baseURL = "http://185.5.199.33:5053";
+    public static String basePostURL = "http://185.5.199.33:5051";
 
     public static String[] permissions = {
             Manifest.permission.INTERNET,
@@ -53,6 +54,7 @@ public class CodeUtility {
             Manifest.permission.ACCESS_FINE_LOCATION};
 
     private CodeUtility(){
+
 
     }
 
@@ -75,7 +77,7 @@ public class CodeUtility {
     }
 
     // Popup if you really want to send your location
-    public void showSendLocation(Context context){
+    public static void showSendLocation(Context context){
         Dialog myDialog = new Dialog(context);
         myDialog.setContentView(R.layout.send_location);
 
@@ -90,7 +92,7 @@ public class CodeUtility {
 
         // TODO replace strings
         aid.setText("Android ID: " + androidID);
-        text.setText("Are you sure you want to send your current location (" + position.latitude + " " + position.longitude + ")?");
+        text.setText(context.getResources().getString(R.string.send_location_confirmation) + " (" + position.latitude + " " + position.longitude + ")");
 
 
         btnYes.setOnClickListener(e->{

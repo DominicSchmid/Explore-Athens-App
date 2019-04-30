@@ -63,7 +63,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     private MapView mapView;
     private GoogleMap mMap;
     private LocationManager locationManager;
-    private String provider;
+    public static String provider;
     private double currentLat = 0, currentLng = 0;
     private boolean drawPolyline;
     private List<Polyline> polylines = new ArrayList<Polyline>();
@@ -96,6 +96,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 }
             }
         }
+
+        new SiteRequest().execute(CodeUtility.baseURL + "/sites");
     }
 
     @Override
@@ -109,6 +111,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
         Log.d("map", "Map Fragment " + mapFragment);
         mapFragment.getMapAsync(this);
+
+
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -205,8 +209,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         // Task that tries to draw site markers on the map
         // TODO check if this breaks because clientside radiuschecking is also possible
         String url = (DRAWINRADIUS ? CodeUtility.baseURL + "/sites?radius=" + DRAWRADIUS_KM : CodeUtility.baseURL + "/sites"); // If drawinradius make radiusrequest
-        SiteRequest req = new SiteRequest();
-        req.execute(url);
+
+        if(CodeUtility.getSites().isEmpty()){
+            SiteRequest req = new SiteRequest();
+            req.execute(url);
+        }
+
 
         //drawRadar(100.0);
         LatLng position = new LatLng(currentLat, currentLng);
@@ -214,13 +222,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         CameraPosition athens = new CameraPosition.Builder().target(ATHENS_LAT_LNG).zoom((float) ZOOM_ATHENS).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(athens));
         mMap.setMyLocationEnabled(true);
+
+        drawMarkers();
     }
 
     public void drawMarkers(){
         mMap.clear(); // Clear old markers
         markerList.clear();
 
-        for(Site s :CodeUtility.getSites()){
+        for(Site s : CodeUtility.getSites()){
             Log.d("info", "Iterating item " + s.getName());
             if (mMap != null) {
                 LatLng position = new LatLng(s.getX(), s.getY());

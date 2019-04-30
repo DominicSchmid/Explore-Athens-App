@@ -5,6 +5,7 @@
     <string name="title_maps">Karte</string>
     <string name="title_sitelist">Sehenswürdigkeiten</string>
     <string name="title_weather">Wetter</string>
+    <string name="title_settings">Einstellungen</string>
 
     <!-- Settings -->
     <string name="pref_title_set_language">Sprache wählen</string>
@@ -20,6 +21,8 @@
     </string-array>
     <string name="pref_enable_radar">Nur Sehenswürdigkeiten in Radius zeigen</string>
     <string name="pref_night_mode">Nachtmodus</string>
+    <string name="pref_category_radar">Radar</string>
+    <string name="pref_category_other">Andere</string>
 
     <string-array name="multi_select_list_preference_default_value" />
 
@@ -62,7 +65,16 @@
     <string name="mapsettings_hybrid">Hypride Karte</string>
     <string name="mapsettings_satellite">Satelliten Karte</string>
     <string name="fragment_weather_updatedText">Erneuert</string>
-    <string name="title_settings">Einstellungen</string>
 
+
+    <!-- Send location -->
+    <string name="send_location_title">Standort senden</string>
+    <string name="send_location_confirmation">Willst du deinen Standort wirklich senden?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="pref_category_network">Netzwerk</string>
+    <string name="pref_default_get_url">URL für REST API</string>
+    <string name="pref_default_post_url">URL für Standort senden</string>
+    <string name="show_android_id">Android ID anzeigen</string>
 
 </resources>

@@ -39,7 +39,7 @@ public class PostRequest extends AsyncTask< String, Void, String > {
             String androidID = strings[0];
             LatLng position = new LatLng(Double.parseDouble(strings[1]), Double.parseDouble(strings[2]));
 
-            URL url = new URL(CodeUtility.baseURL + "/position/" + strings[0] + "?x=" + strings[1] + "&y=" + strings[2]);
+            URL url = new URL(CodeUtility.basePostURL + "/addLocation/" + strings[0] + "/" + position.latitude + "/" + position.longitude);
 
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -50,7 +50,7 @@ public class PostRequest extends AsyncTask< String, Void, String > {
             responseCode = connection.getResponseCode();
             responseContent = connection.getContentType();
 
-            Log.d("connection", "Post connection opened successfully");
+            Log.d("connection", "Post connection to " + url.toString() + " opened successfully. Send location " + position.latitude + "/" + position.longitude);
 
             BufferedReader rd = null;
             if (connection.getResponseCode() == 200)

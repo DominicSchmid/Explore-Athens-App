@@ -1,18 +1,31 @@
 package com.ea.exploreathens;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SeekBarPreference;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.ea.exploreathens.code.CodeUtility;
+import com.ea.exploreathens.fragments.MapsFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MySettings extends PreferenceFragmentCompat {
 
@@ -22,6 +35,7 @@ public class MySettings extends PreferenceFragmentCompat {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
+            String key = preference.getKey();
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
@@ -35,13 +49,19 @@ public class MySettings extends PreferenceFragmentCompat {
                                 ? listPreference.getEntries()[index]
                                 : null);
 
+            } else if(preference instanceof EditTextPreference) {
+                EditTextPreference txt = (EditTextPreference) preference;
+                if(key.equals("pref_default_get_url"))
+                    CodeUtility.baseURL = "http://" + txt.getText();
             } else {
-                String key = preference.getKey();
+
                 switch(key){
                     case "enable_radar":
 
                         break;
+                    case "send_location":
 
+                        break;
                 }
                 // TODO if prefence is switchbutton for radar
 /*
@@ -69,7 +89,60 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
         addPreferencesFromResource(R.xml.settings);
         setHasOptionsMenu(true);
 
+        Preference button = getPreferenceManager().findPreference("send_location");
+        if (button != null) {
+            button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference arg0) {
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @SuppressLint("MissingPermission")
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
 
+                                    LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                                    LatLng position = new LatLng(lm.getLastKnownLocation(MapsFragment.provider).getLatitude(), lm.getLastKnownLocation(MapsFragment.provider).getLongitude());
+                                    PostRequest request = new PostRequest(getContext());
+                                    //request.execute("1fe9979d2c2421be", ""+position.latitude, ""+position.longitude);
+                                    request.execute(CodeUtility.getAndroidId(getContext()), "" + position.latitude, ""+position.longitude);
+
+                                    //Yes button clicked
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    //No button clicked
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder locationBuilder = new AlertDialog.Builder(getContext());
+                    locationBuilder.setMessage(getResources().getString(R.string.send_location_confirmation)).setPositiveButton(getResources().getString(R.string.yes), dialogClickListener)
+                            .setNegativeButton(getResources().getString(R.string.no), dialogClickListener).show();
+                    //CodeUtility.showSendLocation(getContext());
+                    return true;
+                }
+            });
+
+            Preference locationBtn = getPreferenceManager().findPreference("show_android_id");
+            if(locationBtn != null){
+                locationBtn.setOnPreferenceClickListener(pref->{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Android ID: " + CodeUtility.getAndroidId(getContext()))
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+
+                                }
+                            });
+
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                    return true;
+                });
+            }
+        }
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences
         // to their values. When their values change, their summaries are
         // updated to reflect the new value, per the Android Design
