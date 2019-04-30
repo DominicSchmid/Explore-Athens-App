@@ -12,7 +12,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="24dp"
-        android:text="DAY"
+        android:text="@string/wheatherlist_parent_day"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -27,7 +27,7 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="24dp"
         android:gravity="right"
-        android:text="Average Temperature"
+        android:text="@string/wheatherlist_parent_avrageTemperature"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

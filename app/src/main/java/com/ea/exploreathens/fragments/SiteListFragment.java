@@ -136,7 +136,9 @@ public class SiteListFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.d("search", newText);
-                siteAdapter.getFilter().filter(newText);
+                if(siteAdapter != null)
+                    siteAdapter.getFilter().filter(newText);
+
                 return false;
             }
         });
@@ -171,7 +173,7 @@ public class SiteListFragment extends Fragment {
     public void setSites(ArrayList<Site> sites) {
         // Called after a GET request for sites gets the result
         listView.clearAnimation();
-        CodeUtility.sites = sites;
+        CodeUtility.setSites(sites);
 
         siteAdapter = new SiteListAdapter(getContext(),sites);
         listView.setAdapter(siteAdapter);
@@ -187,7 +189,7 @@ public class SiteListFragment extends Fragment {
     }
 
     public void showError(String message){
-        CodeUtility.showError(getContext(), message);
+        CodeUtility.buildError(getActivity(), message).show();
         pullToRefresh.setRefreshing(false);
     }
 
@@ -254,7 +256,8 @@ public class SiteListFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
+    // TODO androidTestImplementation 'com.android.support.maps_site_info:runner:1.0.2'
+    // TODO androidTestImplementation 'com.android.support.maps_site_info.espresso:espresso-core:3.0.2'
 
     class SiteRequest extends AsyncTask< String, Void, String > {
 
@@ -266,8 +269,8 @@ public class SiteListFragment extends Fragment {
             String responseType = "";
 
             try {
-                //if(!CodeUtility.internetAvailable(getContext()))
-                //    return "Internet not available";
+                if(!CodeUtility.internetAvailable(getContext()))
+                    return "Internet not available";
 
                 RequestHelper helper = new RequestHelper();
                 helper.getRequestContent(urls[0]);
@@ -290,7 +293,7 @@ public class SiteListFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String response){
-            Object obj = getJSON(response);
+            Object obj = CodeUtility.getJSON(contentType, response);
 
             if(obj instanceof String) {
                 // Error
@@ -306,27 +309,6 @@ public class SiteListFragment extends Fragment {
                 Log.d("json-sites", sites.toString());
             } else
                 Log.e("json-error", "JSON Parse error. Type not found");
-        }
-
-        public Object getJSON(String responseContent){
-            JSONParser parser = new JSONParser();
-
-            try {
-                // Depending on response-type return correct object
-                if (contentType.equalsIgnoreCase("sites")) {
-                    JSONArray ja = (JSONArray) parser.parse(responseContent);
-
-                    ArrayList<Site> list = Site.parse(ja);
-                    System.out.println(list.toString());
-                    return list;
-                }
-            } catch (Exception ex) {
-                String err = (ex.getMessage() == null) ? "SD Card failed" : ex.getMessage();
-                ex.printStackTrace();
-                Log.e("json-parse-error:", "Could not parse JSON response. Error: "+err);
-            }
-
-            return responseContent;
         }
 
     }

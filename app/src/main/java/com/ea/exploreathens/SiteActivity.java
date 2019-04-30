@@ -47,7 +47,7 @@ public class SiteActivity extends AppCompatActivity {
 
         // Liest die Site aus der übergebenen Index aus, um die Activity mit infos zu füllen
         if(b != null){
-            site = CodeUtility.sites.get(b.getInt("siteindex"));
+            site = CodeUtility.getSites().get(b.getInt("siteindex"));
             Log.d("info", "Got site through bundle: " +  site.toString());
 
             TextView name = findViewById(R.id.siteNameTv);

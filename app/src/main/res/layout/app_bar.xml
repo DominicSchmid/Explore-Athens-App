@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:background="@android:color/background_light"
-        android:queryHint="Suche..."
+        android:queryHint="@string/appbar_search_hint"
         android:scrollbarThumbHorizontal="@android:color/background_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

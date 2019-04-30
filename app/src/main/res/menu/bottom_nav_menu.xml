@@ -16,4 +16,9 @@
         android:icon="@drawable/ic8_cloudy"
         android:title="@string/title_weather" />
 
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic8_settings"
+        android:title="@string/title_settings" />
+
 </menu>

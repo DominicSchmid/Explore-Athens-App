@@ -4,20 +4,20 @@
     <item
         android:id="@+id/action_normal"
         android:orderInCategory="100"
-        android:title="Normal map"
+        android:title="@string/mapsettings_normal"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_hybrid"
         android:orderInCategory="101"
         app:showAsAction="never"
-        android:title="Hybrid map" />
+        android:title="@string/mapsettings_hybrid" />
 
     <item
         android:id="@+id/action_satellite"
         android:orderInCategory="102"
         app:showAsAction="never"
-        android:title="Satellite map" />
+        android:title="@string/mapsettings_satellite" />
 
     <item
         android:id="@+id/action_settings"

@@ -106,13 +106,13 @@ public class WeatherFragment extends Fragment {
         //});
 
         place.setText(forecast.getName());
-        datetime.setText("Updated " + forecast.getDate() + " " + forecast.getTime());
+        datetime.setText(getResources().getString(R.string.fragment_weather_updatedText) + " " + forecast.getDate() + " " + forecast.getTime());
 
         pullToRefresh.setRefreshing(false);
     }
 
     public void showError(String message){
-        CodeUtility.showError(getContext(), message);
+        CodeUtility.buildError(getActivity(), message).show();
         pullToRefresh.setRefreshing(false);
     }
 
@@ -187,7 +187,7 @@ public class WeatherFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String response){
-            Object obj = getJSON(response);
+            Object obj = CodeUtility.getJSON(contentType, response);
 
             if(obj instanceof String) {
                 // Error
@@ -202,27 +202,6 @@ public class WeatherFragment extends Fragment {
                 Log.d("json-weatherforecast", f.toString());
             } else
                 Log.e("json-error", "JSON Parse error. Type not found");
-        }
-
-        public Object getJSON(String responseContent){
-            JSONParser parser = new JSONParser();
-
-            try {
-                // Depending on response-type return correct object
-                if (contentType.equalsIgnoreCase("weatherforecast")) {
-                    JSONObject jo = (JSONObject) parser.parse(responseContent);
-
-                    WeatherForecast f = WeatherForecast.parse(jo);
-                    System.out.println(f.toString());
-                    return f;
-                }
-            } catch (Exception ex) {
-                //String err = (ex.getMessage() == null) ? "SD Card failed" : ex.getMessage();
-                //Log.e("json-parse-error:", err);
-                ex.printStackTrace();
-            }
-
-            return responseContent;
         }
 
     }

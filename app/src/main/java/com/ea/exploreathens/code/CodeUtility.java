@@ -1,5 +1,6 @@
 package com.ea.exploreathens.code;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +15,10 @@ import android.widget.TextView;
 import com.ea.exploreathens.PostRequest;
 import com.ea.exploreathens.R;
 import com.google.android.gms.maps.model.LatLng;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,10 +38,31 @@ public class CodeUtility {
     
     public static String NOTIFICATION_CHANNEL;
 
-    public static ArrayList<Site> sites = new ArrayList<>();
+    private static ArrayList<Site> sites = new ArrayList<>();
     //public static String baseURL = "http://192.168.43.50:5000";
-    public static String baseURL = "http://192.168.1.18:5000";
+    //public static String baseURL = "http://192.168.1.18:5000";
   // public static String baseURL = "http://10.171.152.230:5000";
+    public static String baseURL = "http://185.5.199.33:5053";
+
+    public static String[] permissions = {
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION};
+
+    private CodeUtility(){
+
+    }
+
+    public static synchronized void setSites(ArrayList<Site> sites){
+        CodeUtility.sites = sites;
+    }
+
+    public static synchronized ArrayList<Site> getSites(){
+        return CodeUtility.sites;
+    }
 
     public static String getAndroidId(Context context){
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -98,20 +124,14 @@ public class CodeUtility {
         return Math.pow(Math.sin(val / 2), 2);
     }
 
-    public static void showError(Context context, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    public static AlertDialog buildError(Context context, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.Theme_AppCompat_Dialog_Alert);
         builder.setMessage(message)
                 .setCancelable(false)
                 .setPositiveButton("OK",(DialogInterface dialog, int id) ->{
                     // ONCLICK do things
                 });
-        AlertDialog alert = builder.create();
-
-        try {
-            alert.show();
-        } catch(Exception e){
-            Log.e("error", "Error showing error window " + e.getMessage());
-        }
+        return builder.create();
     }
 
     //Domme's methods
@@ -143,6 +163,38 @@ public class CodeUtility {
             }
         }
         return number;
+    }
+
+    public static Object getJSON(String contentType, String responseContent){
+        JSONParser parser = new JSONParser();
+
+        try {
+            // Depending on response-type return correct object
+            if (contentType.equalsIgnoreCase("sites")) {
+                JSONArray ja = (JSONArray) parser.parse(responseContent);
+
+                ArrayList<Site> list = Site.parse(ja);
+                System.out.println(list.toString());
+                return list;
+            } else if (contentType.equalsIgnoreCase("weatherforecast")) {
+                JSONObject jo = (JSONObject) parser.parse(responseContent);
+
+                WeatherForecast f = WeatherForecast.parse(jo);
+                System.out.println(f.toString());
+                return f;
+            } else if (contentType.equalsIgnoreCase("route")) {
+                JSONObject jo = (JSONObject) parser.parse(responseContent);
+
+                Route r = Route.parse(jo);
+                return r;
+            }
+        } catch (Exception ex) {
+            String err = (ex.getMessage() == null) ? "SD Card failed" : ex.getMessage();
+            ex.printStackTrace();
+            Log.e("json-parse-error:", "Could not parse JSON response. Error: "+err);
+        }
+
+        return responseContent;
     }
 
 
