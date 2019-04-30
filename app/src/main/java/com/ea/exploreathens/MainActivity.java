@@ -1,15 +1,26 @@
 package com.ea.exploreathens;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.ea.exploreathens.code.CodeUtility;
+import com.ea.exploreathens.code.Route;
+import com.ea.exploreathens.code.Site;
+import com.ea.exploreathens.fragments.MapsFragment;
 import com.ea.exploreathens.fragments.SiteListFragment;
 import com.ea.exploreathens.fragments.WeatherFragment;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 public class MainActivity extends AppCompatActivity {
     private TextView mTextMessage;
@@ -30,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_maps:
                     //mTextMessage.setText(R.string.title_home);
+
+                    title = "Maps";
+                    fragmentTransaction.replace(R.id.main_content, new MapsFragment(), "FragmentName");
                     break;
                 case R.id.navigation_sitelist:
                     title = "Sitelist";
@@ -69,6 +83,30 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Home");
         fragmentTransaction.commit();
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Checks for result calls from activities
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (1) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    // Extract the data returned from the child Activity.
+                    String returnValue = data.getStringExtra("routeTo");
+                    if(returnValue != null){
+                        // TODO an maps activity route senden
+                        // TODO start fragment containing routeto string
+
+
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+
+
 
 
 

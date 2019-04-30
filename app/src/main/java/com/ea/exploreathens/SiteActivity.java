@@ -1,7 +1,10 @@
 package com.ea.exploreathens;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,8 +18,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.ea.exploreathens.code.CodeUtility;
+import com.ea.exploreathens.code.Route;
 import com.ea.exploreathens.code.Site;
 import com.google.android.gms.maps.model.LatLng;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.util.ArrayList;
 
 public class SiteActivity extends AppCompatActivity {
 
@@ -56,30 +66,22 @@ public class SiteActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.siteRouteBtn);
         fab.setOnClickListener(view -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("routeTo", site.getName()); // Returns routeTo - sitename to the parent activity
+            setResult(Activity.RESULT_OK, resultIntent);
+            finish();
+        });
+
+            // TODO load fragment with extras
+
             /*Snackbar.make(view, "Route berechnen...", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("routeTo", sitename); // Returns routeTo - sitename to the parent activity
-            setResult(Activity.RESULT_OK, resultIntent);
-            finish();*/
+
             // TODO move sendlocation somewhere else and put route here
             //showSendLocation(this);
             Snackbar.make(view, site.getImageLocalPaths().toString(), Snackbar.LENGTH_LONG).show();
-        });
+        });*/
 
-    }
-
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
 }

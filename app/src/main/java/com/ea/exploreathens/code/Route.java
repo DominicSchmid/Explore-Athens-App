@@ -20,6 +20,14 @@ public class Route {
         this.coordinates = coordinates;
     }
 
+    public ArrayList<Step> getSteps() {
+        return steps;
+    }
+
+    public ArrayList<Coordinate> getCoordinates() {
+        return coordinates;
+    }
+
     @SuppressWarnings("unchecked")
     public static Route parse(JSONObject obj) {
         try {

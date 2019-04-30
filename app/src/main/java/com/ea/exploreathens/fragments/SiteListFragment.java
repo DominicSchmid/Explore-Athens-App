@@ -266,8 +266,8 @@ public class SiteListFragment extends Fragment {
             String responseType = "";
 
             try {
-                if(!CodeUtility.internetAvailable(getContext()))
-                    return "Internet not available";
+                //if(!CodeUtility.internetAvailable(getContext()))
+                //    return "Internet not available";
 
                 RequestHelper helper = new RequestHelper();
                 helper.getRequestContent(urls[0]);

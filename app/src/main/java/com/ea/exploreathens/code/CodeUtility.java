@@ -30,15 +30,13 @@ public class CodeUtility {
     public static DateTimeFormatter dF = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static DateTimeFormatter tF = DateTimeFormatter.ofPattern("HH:mm:ss");
     public static DateTimeFormatter dtF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-
-
+    
     public static String NOTIFICATION_CHANNEL;
 
     public static ArrayList<Site> sites = new ArrayList<>();
-   // public static String baseURL = "http:///192.168.43.50:5000";
-   //public static String baseURL = "http:///192.168.1.18:5000";
-   public static String baseURL = "http://127.0.0.1:5000";
+    //public static String baseURL = "http://192.168.43.50:5000";
+    public static String baseURL = "http://192.168.1.18:5000";
+  // public static String baseURL = "http://10.171.152.230:5000";
 
     public static String getAndroidId(Context context){
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -82,6 +80,22 @@ public class CodeUtility {
         });
 
         myDialog.show();
+    }
+
+    public static double haversine(double lat1, double lon1, double lat2, double lon2) {
+        final double earthRadius = 6371; // In kilometers
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+
+        double a = haversin(dLat) + Math.cos(lat1) * Math.cos(lon1) * haversin(dLon);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadius * c * 1000;
+    }
+
+    private static double haversin(double val) {
+        return Math.pow(Math.sin(val / 2), 2);
     }
 
     public static void showError(Context context, String message) {
