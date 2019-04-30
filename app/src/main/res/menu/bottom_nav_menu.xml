@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_maps"
+        android:icon="@drawable/ic8_maps"
+        android:title="@string/title_maps" />
+
+    <item
+        android:id="@+id/navigation_sitelist"
+        android:icon="@drawable/ic8_camera"
+        android:title="@string/title_sitelist" />
+
+    <item
+        android:id="@+id/navigation_weather"
+        android:icon="@drawable/ic8_cloudy"
+        android:title="@string/title_weather" />
+
+</menu>
