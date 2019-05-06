@@ -1,0 +1,60 @@
+<resources>
+    <!-- Navigation -->
+    <string name="title_maps">Karte</string>
+    <string name="title_sitelist">Sehenswürdigkeiten</string>
+    <string name="title_weather">Wetter</string>
+
+    <!-- Content Site -->
+    <string name="content_site_name">Name</string>
+    <string name="content_site_address">Adresse</string>
+    <string name="content_site_description">Beschreibung"</string>
+
+    <!-- Fragment Weather -->
+    <string name="fragment_weather_loadingText">Wetter wird abgefragt...</string>
+    <string name="fragment_weather_waitingText">"Bitte warten..."</string>
+
+    <!-- Send Location -->
+    <string name="send_location_cancel">Abbrechen</string>
+    <string name="send_location_send">Senden</string>
+    <string name="send_location_androidId">Android ID</string>
+    <string name="send_location_location">Standort</string>
+
+    <!-- Sitelist Item -->
+    <string name="sitelist_item_name">Akropolis</string>
+    <string name="sitelist_item_address">Max Mustermannstraße 1</string>
+    <string name="sitelist_item_distance">420m</string>
+
+    <!-- Weatherlist Item -->
+    <string name="weatherlist_item_time">06:00:00</string>
+    <string name="weatherlist_item_date">16.09.18</string>
+    <string name="weatherlist_item_description">Wetter-Beschreibung</string>
+    <string name="weatherlist_item_mintemperature">-3°</string>
+    <string name="weatherlist_item_maxtemperature">14°</string>
+
+    <!-- Weatherlist Parent -->
+    <string name="wheatherlist_parent_day">16.09.18</string>
+    <string name="wheatherlist_parent_avrageTemperature">14°</string>
+    <string name="appbar_search_hint">Suchen...</string>
+    <string name="mapsettings_normal">Normale Karte</string>
+    <string name="mapsettings_hybrid">Hypride Karte</string>
+    <string name="mapsettings_satellite">Satelliten Karte</string>
+
+    <!-- Settings -->
+    <string name="pref_title_set_language">Sprache auswählen</string>
+    <string name="pref_enable_radar">Nur Sehenswürdigkeiten in Radius zeigen</string>
+    <string name="pref_night_mode">Nachtmodus</string>
+    <string name="fragment_weather_updatedText">Erneuert</string>
+    <string name="title_settings">Einstellungen</string>
+    <string name="pref_category_radar">Radar</string>
+    <string name="pref_category_other">Andere</string>
+
+    <!-- Send location -->
+    <string name="send_location_title">Standort senden</string>
+    <string name="send_location_confirmation">Willst du deinen Standort wirklich senden?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+    <string name="pref_category_network">Netzwerk</string>
+    <string name="pref_default_get_url">URL für REST API</string>
+    <string name="pref_default_post_url">URL für Standort senden</string>
+    <string name="show_android_id">Android ID anzeigen</string>
+</resources>

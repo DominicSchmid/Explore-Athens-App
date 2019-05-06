@@ -1,0 +1,60 @@
+<resources>
+    <!-- Navigation -->
+    <string name="title_maps">Map</string>
+    <string name="title_sitelist">Sites</string>
+    <string name="title_weather">Weather</string>
+    <string name="title_settings">Settings</string>
+
+    <!-- Content Site -->
+    <string name="content_site_name">Name</string>
+    <string name="content_site_address">Address</string>
+    <string name="content_site_description">Description</string>
+
+    <!-- Fragment Weather -->
+    <string name="fragment_weather_loadingText">Loading weather...</string>
+    <string name="fragment_weather_waitingText">Please wait...</string>
+
+    <!-- Send Location -->
+    <string name="send_location_cancel">Cancel</string>
+    <string name="send_location_send">Send</string>
+    <string name="send_location_androidId">Android ID</string>
+    <string name="send_location_location">Location</string>
+
+    <!-- Sitelist Item -->
+    <string name="sitelist_item_name">Akropolis</string>
+    <string name="sitelist_item_address">Max Mustermannstraße 1</string>
+    <string name="sitelist_item_distance">420m</string>
+
+    <!-- Weatherlist Item -->
+    <string name="weatherlist_item_time">06:00:00</string>
+    <string name="weatherlist_item_date">16.09.18</string>
+    <string name="weatherlist_item_description">Weather-Description</string>
+    <string name="weatherlist_item_mintemperature">-3°</string>
+    <string name="weatherlist_item_maxtemperature">14°</string>
+
+    <!-- Weatherlist Parent -->
+    <string name="wheatherlist_parent_day">16.09.18</string>
+    <string name="wheatherlist_parent_avrageTemperature">14°</string>
+    <string name="appbar_search_hint">Search...</string>
+    <string name="mapsettings_normal">Normal map</string>
+    <string name="mapsettings_hybrid">Hyprid map</string>
+    <string name="mapsettings_satellite">Satellite Map</string>
+
+    <!-- Settings -->
+    <string name="pref_title_set_language">Select language</string>
+    <string name="pref_enable_radar">Only show sites in radius</string>
+    <string name="pref_night_mode">Night mode</string>
+    <string name="fragment_weather_updatedText">Updated</string>
+    <string name="pref_category_radar">Radar</string>
+    <string name="pref_category_other">Other</string>
+
+    <!-- Send location -->
+    <string name="send_location_title">Send location</string>
+    <string name="send_location_confirmation">Are you sure you want to send your location?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="pref_category_network">Network</string>
+    <string name="pref_default_get_url">URL for REST API</string>
+    <string name="pref_default_post_url">URL for sending location</string>
+    <string name="show_android_id">Show Android ID</string>
+</resources>
