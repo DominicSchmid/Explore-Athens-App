@@ -199,6 +199,14 @@ public class CodeUtility {
         return responseContent;
     }
 
+    public static Site getSiteByName(String siteName){
+        for(Site s: sites){
+            if(s.getName().equalsIgnoreCase(siteName))
+                return s;
+        }
+        return null;
+    }
+
 
 
 }

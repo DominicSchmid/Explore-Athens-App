@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.ea.exploreathens.code.CodeUtility;
+import com.ea.exploreathens.code.Site;
 import com.ea.exploreathens.fragments.MapsFragment;
 import com.ea.exploreathens.fragments.SiteListFragment;
 import com.ea.exploreathens.fragments.WeatherFragment;
@@ -98,6 +99,14 @@ public class MainActivity extends AppCompatActivity {
                     // Extract the data returned from the child Activity.
                     String returnValue = data.getStringExtra("routeTo");
                     if(returnValue != null){
+                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                        //fragmentTransaction.replace(R.id.main_content, new WeatherFragment(), "FragmentName");
+                        fragmentTransaction.replace(R.id.main_content, new MapsFragment(), "FragmentName");
+                        setTitle("Home");
+                        fragmentTransaction.commit();
+
+
+                        Site s = CodeUtility.getSiteByName(returnValue);
                         // TODO an maps activity route senden
                         // TODO start fragment containing routeto string
 
