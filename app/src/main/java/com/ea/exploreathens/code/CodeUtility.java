@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Button;
@@ -37,6 +38,11 @@ public class CodeUtility {
     public static DateTimeFormatter dtF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
     public static String NOTIFICATION_CHANNEL;
+    public static Fragment MapsFragment;
+
+    public static double DRAWRADIUS_KM = 2.5;
+    public static boolean DRAWINRADIUS = false; // TODO preferences should set this
+    public static boolean firstStart = true;
 
     private static ArrayList<Site> sites = new ArrayList<>();
     //public static String baseURL = "http://192.168.43.50:5000";

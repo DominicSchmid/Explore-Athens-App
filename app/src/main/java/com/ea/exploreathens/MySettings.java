@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.support.v14.preference.SwitchPreference;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
@@ -19,9 +20,11 @@ import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SeekBarPreference;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.SeekBar;
 
 import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.fragments.MapsFragment;
@@ -29,13 +32,40 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class MySettings extends PreferenceFragmentCompat {
 
-    private SeekBarPreference seekBarRadar;
-
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
             String key = preference.getKey();
+
+
+            Log.d("preference", "Key: " + key);
+
+            switch(key){
+                case "seek_bar_radar":
+
+                    SeekBarPreference mSeekBar = (SeekBarPreference) preference;
+                    int seekBarValue = mSeekBar.getValue();
+                    CodeUtility.DRAWRADIUS_KM = (double) (seekBarValue / 1000);
+                    Log.d("preference", "Radius changed to " + seekBarValue);
+
+                    break;
+                case "radar_switch":
+                    SwitchPreference radarSW = (SwitchPreference) preference;
+                    CodeUtility.DRAWINRADIUS = radarSW.isChecked();
+                    Log.d("preference", "Radar status changed to " + radarSW.isChecked());
+                    break;
+                case "default_get_url":
+                    EditTextPreference txt = (EditTextPreference) preference;
+                    if(key.equals("pref_default_get_url"))
+                        CodeUtility.baseURL = "http://" + txt.getText();
+                    break;
+                case "send_location":
+
+                    break;
+            }
+
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
@@ -49,20 +79,8 @@ public class MySettings extends PreferenceFragmentCompat {
                                 ? listPreference.getEntries()[index]
                                 : null);
 
-            } else if(preference instanceof EditTextPreference) {
-                EditTextPreference txt = (EditTextPreference) preference;
-                if(key.equals("pref_default_get_url"))
-                    CodeUtility.baseURL = "http://" + txt.getText();
             } else {
 
-                switch(key){
-                    case "enable_radar":
-
-                        break;
-                    case "send_location":
-
-                        break;
-                }
                 // TODO if prefence is switchbutton for radar
 /*
 I glab es isch folsch wenn man probiert in do AppCompactSettingsActivity irgendwelche settings zu ändern
@@ -100,16 +118,12 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which){
                                 case DialogInterface.BUTTON_POSITIVE:
-
-                                    LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-                                    LatLng position = new LatLng(lm.getLastKnownLocation(MapsFragment.provider).getLatitude(), lm.getLastKnownLocation(MapsFragment.provider).getLongitude());
                                     PostRequest request = new PostRequest(getContext());
                                     //request.execute("1fe9979d2c2421be", ""+position.latitude, ""+position.longitude);
-                                    request.execute(CodeUtility.getAndroidId(getContext()), "" + position.latitude, ""+position.longitude);
+                                    request.execute(CodeUtility.getAndroidId(getContext()), "" + MapsFragment.currentLat, ""+MapsFragment.currentLng);
 
                                     //Yes button clicked
                                     break;
-
                                 case DialogInterface.BUTTON_NEGATIVE:
                                     //No button clicked
                                     break;
@@ -154,7 +168,7 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
-        seekBarRadar = (SeekBarPreference) findPreference("seek_bar_radar"); //Preference Key
+        //seekBarRadar = (SeekBarPreference) findPreference("seek_bar_radar"); //Preference Key
     }
 
 
@@ -219,7 +233,5 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
             return super.onOptionsItemSelected(item);
         }
     }
-
-
 
 }

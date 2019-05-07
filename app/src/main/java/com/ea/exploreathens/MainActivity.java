@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.code.Site;
@@ -41,7 +42,10 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_maps:
                     //mTextMessage.setText(R.string.title_home);
                     title = getResources().getString(R.string.title_maps);
-                    fragmentTransaction.replace(R.id.main_content, new MapsFragment(), "FragmentName");
+                    if(CodeUtility.MapsFragment == null)
+                        CodeUtility.MapsFragment = new MapsFragment();
+
+                    fragmentTransaction.replace(R.id.main_content, CodeUtility.MapsFragment, "FragmentName");
                     break;
                 case R.id.navigation_sitelist:
                     title = getResources().getString(R.string.title_sitelist);
@@ -82,38 +86,53 @@ public class MainActivity extends AppCompatActivity {
                     0);
         } while (missingMapsPermissions());
 
+        if(CodeUtility.MapsFragment == null)
+            CodeUtility.MapsFragment = new MapsFragment();
+
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         //fragmentTransaction.replace(R.id.main_content, new WeatherFragment(), "FragmentName");
-        fragmentTransaction.replace(R.id.main_content, new MapsFragment(), "FragmentName");
+        fragmentTransaction.replace(R.id.main_content, CodeUtility.MapsFragment, "FragmentName");
         setTitle("Home");
         fragmentTransaction.commit();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        //MapStateManager mgr = new MapStateManager(this);
+        //mgr.saveMapState(mMap);
+        Toast.makeText(this, "Map State has been save?", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Checks for result calls from activities
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            case (1) : {
-                if (resultCode == Activity.RESULT_OK) {
-                    // Extract the data returned from the child Activity.
-                    String returnValue = data.getStringExtra("routeTo");
-                    if(returnValue != null){
-                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        //fragmentTransaction.replace(R.id.main_content, new WeatherFragment(), "FragmentName");
-                        fragmentTransaction.replace(R.id.main_content, new MapsFragment(), "FragmentName");
-                        setTitle("Home");
-                        fragmentTransaction.commit();
+
+        if (resultCode == Activity.RESULT_OK) {
+            // Extract the data returned from the child Activity.
+            String returnValue = data.getStringExtra("routeTo");
+            Log.d("MainRouteTo", returnValue);
+
+            if(returnValue != null){
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                //fragmentTransaction.replace(R.id.main_content, new WeatherFragment(), "FragmentName");
+                MapsFragment frag = new MapsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("routeTo", returnValue);
+                CodeUtility.MapsFragment.setArguments(bundle);
+                //CodeUtility.MapsFragment = frag;
+                fragmentTransaction.replace(R.id.main_content, CodeUtility.MapsFragment, "FragmentName");
+                setTitle("Home");
+                fragmentTransaction.commit();
 
 
-                        Site s = CodeUtility.getSiteByName(returnValue);
-                        // TODO an maps activity route senden
-                        // TODO start fragment containing routeto string
+                Site s = CodeUtility.getSiteByName(returnValue);
+                // TODO an maps activity route senden
+                // TODO start fragment containing routeto string
 
 
-                    }
-                }
-                break;
             }
         }
     }

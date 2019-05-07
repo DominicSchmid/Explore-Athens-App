@@ -68,7 +68,7 @@ public class SiteListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-
+        updateSites();
     }
 
     @Override
@@ -79,8 +79,6 @@ public class SiteListFragment extends Fragment {
         listView = wView.findViewById(R.id.sitelist);
         pullToRefresh = wView.findViewById(R.id.sitelistRefreshLayout);
         pullToRefresh.setRefreshing(true);
-
-        updateSites();
 
         pullToRefresh.setOnRefreshListener(() -> {
             // First delete old images

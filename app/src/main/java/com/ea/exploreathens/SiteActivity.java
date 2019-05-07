@@ -69,6 +69,7 @@ public class SiteActivity extends AppCompatActivity {
             Intent resultIntent = new Intent();
             resultIntent.putExtra("routeTo", site.getName()); // Returns routeTo - sitename to the parent activity
             setResult(Activity.RESULT_OK, resultIntent);
+
             finish();
         });
 
