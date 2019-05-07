@@ -39,7 +39,7 @@ public class CodeUtility {
     
     public static String NOTIFICATION_CHANNEL;
 
-    public static double DRAWRADIUS_KM = 2.5;
+    public static double DRAWRADIUS_METERS = 1000;
     public static boolean DRAWINRADIUS = false; // TODO preferences should set this
     public static boolean firstStart = true;
     public static LatLng MAP_ZOOM_CENTER;
@@ -133,6 +133,9 @@ public class CodeUtility {
     }
 
     public static AlertDialog buildError(Context context, String message) {
+        if(context == null)
+            return null;
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.Theme_AppCompat_Dialog_Alert);
         builder.setMessage(message)
                 .setCancelable(false)

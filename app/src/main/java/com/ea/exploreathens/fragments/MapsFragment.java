@@ -83,6 +83,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         setHasOptionsMenu(true);
         //setRetainInstance(true);
 
+        // Make site request if sites are not loaded yet. Just in case..
+        if(CodeUtility.getSites().isEmpty())
+            new SiteRequest().execute(CodeUtility.baseURL + "/sites");
+
         Bundle args = this.getArguments();
         if (args != null) {
             // Was called from Site Activity and now a route needs to be calculated
@@ -94,9 +98,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             req.execute(CodeUtility.baseURL + "/route/" + currentLng + "," + currentLat + "/" + s.getY() + "," + s.getX());
         }
 
-        // Make site request if sites are not loaded yet. Just in case..
-        if(CodeUtility.getSites() == null)
-            new SiteRequest().execute(CodeUtility.baseURL + "/sites");
+
 
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         provider = locationManager.getBestProvider(new Criteria(), false);
@@ -125,7 +127,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         return wView;
     }
 
-
     public void redrawRoute(Route route) {
         ArrayList<Coordinate> coordinatesList = route.getCoordinates();
         LatLng latLngPrevious = new LatLng(currentLat, currentLng);
@@ -147,18 +148,27 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
     }
 
-    public void drawRadar(double meter) {
+
+    public void drawRadar() {
         if (mMap != null) {
+            Log.d("radar", "Trying to radar");
             mMap.addCircle(new CircleOptions()
-                    .center(CodeUtility.getSiteCenter())
-                    .radius(meter)
+                    .center(new LatLng(CodeUtility.getSiteCenter().latitude,  CodeUtility.getSiteCenter().longitude))
+                    .radius(CodeUtility.DRAWRADIUS_METERS)
                     .strokeWidth(0f)
                     .fillColor(0x550000FF));
 
-            //TODO: change ATHENS_LAT_LNG with position
+            if(CodeUtility.getSites().isEmpty()){
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
             for (Site s : CodeUtility.getSites()) {
-                if (CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude) > meter) {
+                Log.d("radar", "Coords for " + s.getName() + ": " + s.getX() + " " +  s.getY() + " " + CodeUtility.getSiteCenter().latitude + " " +  CodeUtility.getSiteCenter().longitude + " - HAVERSINE: " + CodeUtility.haversine(s.getX(), s.getY(),  CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude));
+                if (CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude) > CodeUtility.DRAWRADIUS_METERS) { // TODO Change getSiteCenter with curr position
                     markerList.get(s.getName()).remove();
                 }
             }
@@ -193,11 +203,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
+
+        if(CodeUtility.getSites().isEmpty()){
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         if(CodeUtility.firstStart) {
+            Log.d("info", "First start detected: Zooming into " + CodeUtility.getSiteCenter().toString());
             CameraPosition athens = new CameraPosition.Builder().target(CodeUtility.getSiteCenter()).zoom((float) ZOOM_ATHENS).build();
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(athens));
             CodeUtility.firstStart = false;
+            MapStateManager mgr = new MapStateManager(getContext());
+            mgr.saveMapState(mMap);
         } else {
             MapStateManager mgr = new MapStateManager(getContext());
             CameraPosition position = mgr.getSavedCameraPosition();
@@ -210,14 +232,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
         // Task that tries to draw site markers on the map
         // TODO check if this breaks because clientside radiuschecking is also possible
-        String url = (CodeUtility.DRAWINRADIUS ? CodeUtility.baseURL + "/sites?radius=" + CodeUtility.DRAWRADIUS_KM : CodeUtility.baseURL + "/sites"); // If drawinradius make radiusrequest
+        //String url = (CodeUtility.DRAWINRADIUS ? CodeUtility.baseURL + "/sites?radius=" + CodeUtility.DRAWRADIUS_METERS : CodeUtility.baseURL + "/sites"); // If drawinradius make radiusrequest
 
-        if(CodeUtility.getSites().isEmpty())
-            new SiteRequest().execute(url);
-
-        mMap.setMyLocationEnabled(true);
+        //if(CodeUtility.getSites().isEmpty())
+        //    new SiteRequest().execute(url);
 
         drawMarkers();
+        if(true) // TODO CodeUtility.DRAWINRADIUS
+            drawRadar();
     }
 
     public void drawMarkers(){
@@ -273,6 +295,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
     }
 
+    // Resumes state of map
     @Override
     public void onResume() {
         super.onResume();
@@ -352,23 +375,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
     }
 
-    //Just "must have" methods
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) { }
-
-    @Override
-    public void onProviderEnabled(String provider) {}
-
-    @Override
-    public void onProviderDisabled(String provider) {}
-
-
     public void drawRoute(Route route){
         ArrayList <Coordinate> coordinatesList = route.getCoordinates();
         LatLng latLngPrevious = new LatLng(currentLat, currentLng);
 
         if (mMap != null) {
             for (Coordinate c : coordinatesList) {
+                Log.d("route", "Drawing " + c.toString());
+
                 //get current coordinates with LatLngNext
                 LatLng latLngNext = new LatLng(c.getY(), c.getX());
 
@@ -463,7 +477,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 //og.e("connection-error", ""+err);
                 return "Oh no, an error occured :(";
             }
-
         }
 
         @Override
@@ -537,12 +550,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 ArrayList<Site> sites = (ArrayList<Site>) obj;
                 CodeUtility.setSites(sites);
 
-                drawMarkers();
+                setupMapIfNeeded();
+                //drawMarkers();
                 Log.d("json-sites", sites.toString());
             } else
                 Log.e("json-error", "JSON Parse error. Type not found");
         }
 
     }
+
+    //Just "must have" methods
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    @Override
+    public void onProviderEnabled(String provider) {}
+
+    @Override
+    public void onProviderDisabled(String provider) {}
 
 }

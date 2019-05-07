@@ -49,7 +49,7 @@ public class MySettings extends PreferenceFragmentCompat implements SharedPrefer
 
                     SeekBarPreference mSeekBar = (SeekBarPreference) preference;
                     int seekBarValue = mSeekBar.getValue();
-                    CodeUtility.DRAWRADIUS_KM = (double) (seekBarValue / 1000);
+                    CodeUtility.DRAWRADIUS_METERS = (double) seekBarValue;
                     Log.d("preference", "Radius changed to " + seekBarValue);
 
                     break;
@@ -110,7 +110,6 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
         setHasOptionsMenu(true);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
 
         Preference button = getPreferenceManager().findPreference("send_location");
         if (button != null) {
@@ -204,7 +203,7 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
 
                 SeekBarPreference mSeekBar = (SeekBarPreference) preference;
                 int seekBarValue = mSeekBar.getValue();
-                CodeUtility.DRAWRADIUS_KM = (double) (seekBarValue / 1000);
+                CodeUtility.DRAWRADIUS_METERS = (double) seekBarValue;
                 Log.d("sharedpreference", "Radius changed to " + seekBarValue);
 
                 break;

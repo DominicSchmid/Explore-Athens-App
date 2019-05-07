@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar();
 
         navView = findViewById(R.id.nav_view);
-        navView.setSelectedItemId(0);
+
         //mTextMessage = findViewById(R.id.message);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -110,11 +110,10 @@ public class MainActivity extends AppCompatActivity {
                 bundle.putString("routeTo", returnValue);
                 frag.setArguments(bundle);
                 //CodeUtility.MapsFragment = frag;
-
+                navView.getMenu().getItem(0).setChecked(true);
                 fragmentTransaction.replace(R.id.main_content, frag, "FragmentName");
                 setTitle("Home");
                 fragmentTransaction.commit();
-
 
                 Site s = CodeUtility.getSiteByName(returnValue);
                 // TODO an maps activity route senden
