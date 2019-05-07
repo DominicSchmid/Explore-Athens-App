@@ -111,7 +111,6 @@ public class Weather {
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
         return name + " (" + date + " " + time + "): Min=" + min_temp + "°C Max=" + max_temp + "°C Cur=" + temp + "°C Hum=" + humidity + " " + description;
     }
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -10,24 +9,29 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/tvName"
+            android:id="@+id/map_info_name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:text="Akropolis"
             android:textAllCaps="true"
             android:textSize="20sp"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="8dp" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvDistance"
+            android:id="@+id/map_info_street_tv"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
+            android:gravity="right"
             android:text="420m"
             android:textSize="20sp"
-            tools:layout_editor_absoluteX="38dp"
-            tools:layout_editor_absoluteY="35dp" />
+            app:layout_constraintEnd_toEndOf="@+id/map_info_name_tv"
+            app:layout_constraintStart_toStartOf="@+id/map_info_name_tv"
+            app:layout_constraintTop_toBottomOf="@+id/map_info_name_tv" />
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

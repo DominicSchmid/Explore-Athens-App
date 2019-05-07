@@ -10,8 +10,8 @@ public class Route {
     private double distance;
     private double duration;
 
-    private ArrayList<Step> steps = new ArrayList<>();
-    private ArrayList<Coordinate> coordinates = new ArrayList<>();
+    private ArrayList<Step> steps;
+    private ArrayList<Coordinate> coordinates;
 
     public Route(double distance, double duration, ArrayList<Step> steps, ArrayList<Coordinate> coordinates) {
         this.distance = distance;
@@ -49,8 +49,6 @@ public class Route {
                 int type = CodeUtility.parseInt(content.get("type"));
                 String instruction = (String) content.get("instruction");
                 String name = (String) content.get("name");
-
-                // TODO evtl way_points array parsen
 
                 steplist.add(new Step(distance, duration, type, instruction, name));
             });

@@ -52,8 +52,8 @@ public class SiteListAdapter extends ArrayAdapter<Site> {
         }
 
         if(!CodeUtility.internetAvailable(mContext)){
-            // Wenn kein internet lese aus lokalen dateien aus
-            // TODO nicht nur images sondern auch json sites mit infos....
+            // TODO Wenn kein internet lese aus lokalen dateien aus
+            // nicht nur images sondern auch json sites mit infos
         } else
             Picasso.get().load(CodeUtility.baseURL + "/image/" + site.getImageRequestPaths().get(0)).into(image);
         //displayImage(site, image);

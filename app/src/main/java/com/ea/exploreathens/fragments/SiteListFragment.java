@@ -13,14 +13,13 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.view.Gravity;
-import android.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import com.ea.exploreathens.R;
 import com.ea.exploreathens.RequestHelper;
@@ -30,9 +29,6 @@ import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.code.Site;
 
 import org.apache.commons.io.FileUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,9 +47,6 @@ public class SiteListFragment extends Fragment {
     ListView listView;
     SiteListAdapter siteAdapter;
     ConstraintLayout searchBar;
-
-    /* TODO Beim Start der app soll ein site request durchgeführt werden, um die sites zu aktualisieren,
-    TODO wenn man auf z.b. weather klickt, wird ein weather request durchgeführt und bei der Antwort wird die Weatheractivity gestartet */
 
     SwipeRefreshLayout pullToRefresh;
 
@@ -90,40 +83,9 @@ public class SiteListFragment extends Fragment {
             }
 
             updateSites();
-            // pullToRefresh.setRefreshing(false);
         });
-
-        /*try {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch(Exception omegalul){
-            Log.e("Site", "Backbutton failed!");
-        }*/
-
-       //FloatingActionButton fab = wView.findViewById(R.id.siteRouteBtn);
-       // fab.setOnClickListener(view -> {
-            /*Snackbar.make(view, "Route berechnen...", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("routeTo", sitename); // Returns routeTo - sitename to the parent activity
-            setResult(Activity.RESULT_OK, resultIntent);
-            finish();*/
-            // TODO move sendlocation somewhere else and put route here
-            //showSendLocation(this);
-            //Snackbar.make(view, site.getImageLocalPaths().toString(), Snackbar.LENGTH_LONG).show();
-       // });
-
 
         SearchView searchStuff = wView.findViewById(R.id.toolbarSearch);
-        /*searchStuff.setOnSearchClickListener(e->{
-            getActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
-            // title.setVisibility(View.INVISIBLE);
-        });
-        searchStuff.setOnCloseListener(()->{
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
-            //title.setVisibility(View.VISIBLE);
-            return false;
-        });*/
-
         searchStuff.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -215,13 +177,6 @@ public class SiteListFragment extends Fragment {
         return localpath;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
  /*   @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -250,11 +205,8 @@ public class SiteListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-    // TODO androidTestImplementation 'com.android.support.maps_site_info:runner:1.0.2'
-    // TODO androidTestImplementation 'com.android.support.maps_site_info.espresso:espresso-core:3.0.2'
 
     class SiteRequest extends AsyncTask< String, Void, String > {
 

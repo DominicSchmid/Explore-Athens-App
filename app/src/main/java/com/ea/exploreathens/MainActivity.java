@@ -3,26 +3,22 @@ package com.ea.exploreathens;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.annotation.NonNull;
-import android.support.v7.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ea.exploreathens.code.CodeUtility;
-import com.ea.exploreathens.code.Site;
 import com.ea.exploreathens.fragments.MapsFragment;
 import com.ea.exploreathens.fragments.SiteListFragment;
 import com.ea.exploreathens.fragments.WeatherFragment;
@@ -58,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                     //mTextMessage.setText(R.string.title_dashboard);
                     break;
                 case R.id.navigation_weather:
-                    title = getResources().getString(R.string.title_weather); // TODO string resource
+                    title = getResources().getString(R.string.title_weather);
                     fragmentTransaction.replace(R.id.main_content, new WeatherFragment(), "FragmentName");
                     break;
                     //mTextMessage.setText(R.string.title_notifications);
@@ -129,12 +125,6 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction.replace(R.id.main_content, frag, "FragmentName");
                 setTitle("Home");
                 fragmentTransaction.commit();
-
-                Site s = CodeUtility.getSiteByName(returnValue);
-                // TODO an maps activity route senden
-                // TODO start fragment containing routeto string
-
-
             }
         }
     }

@@ -80,9 +80,6 @@ public class ExpandableWeatherAdapter extends BaseExpandableListAdapter {
         if(groupPosition < childList.size())
             parentAvgTemp.setText(WeatherForecast.getAvgTemperature(childList.get(groupPosition)) + "°C");
 
-
-
-
         return convertView;
     }
 
@@ -98,12 +95,8 @@ public class ExpandableWeatherAdapter extends BaseExpandableListAdapter {
             Toast.makeText(context, weather.toString(), Toast.LENGTH_LONG).show();
         });
 
-        ImageView image = (ImageView)listItem.findViewById(R.id.weatherlistIcon);
-        // TODO  getImage by path from site.localpath
+        ImageView image = listItem.findViewById(R.id.weatherlistIcon);
         Picasso.get().load("http://openweathermap.org/img/w/" + weather.getIcon() + ".png").into(image);
-        //image.setImageResource(R.drawable.ic_launcher_background);
-        //if(position == 0)
-        //    image.setImageResource(R.drawable.img1);
 
         TextView time = listItem.findViewById(R.id.weatherlistTimeTv);
         time.setText(""+weather.getTime());
@@ -112,16 +105,6 @@ public class ExpandableWeatherAdapter extends BaseExpandableListAdapter {
         date.setText(""+weather.getDate().getDayOfWeek().name());
         date.setVisibility(View.INVISIBLE);
 
-        // Only show date if it is a different day than before
-        /*if(childPosition > 0){
-            Weather yesterday = weatherList.get(childPosition - 1);
-            if(!weather.getDate().isEqual(yesterday.getDate())){
-                date.setVisibility(View.VISIBLE);
-
-            }
-        } else
-            date.setVisibility(View.VISIBLE);
-*/
         TextView description = listItem.findViewById(R.id.weatherlistDescriptionTv);
         description.setText(weather.getDescription());
 

@@ -1,6 +1,5 @@
 package com.ea.exploreathens.fragments;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,25 +13,10 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.ea.exploreathens.ExpandableWeatherAdapter;
-import com.ea.exploreathens.MainActivity;
 import com.ea.exploreathens.R;
 import com.ea.exploreathens.RequestHelper;
 import com.ea.exploreathens.code.CodeUtility;
-import com.ea.exploreathens.code.Route;
-import com.ea.exploreathens.code.Site;
-import com.ea.exploreathens.code.Weather;
 import com.ea.exploreathens.code.WeatherForecast;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -116,13 +100,6 @@ public class WeatherFragment extends Fragment {
         pullToRefresh.setRefreshing(false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     /*@Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -151,7 +128,6 @@ public class WeatherFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 

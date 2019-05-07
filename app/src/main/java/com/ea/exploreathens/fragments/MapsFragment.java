@@ -22,10 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-
-import com.ea.exploreathens.MainActivity;
 import com.ea.exploreathens.MapStateManager;
 import com.ea.exploreathens.MySettings;
 import com.ea.exploreathens.R;
@@ -38,7 +35,6 @@ import com.ea.exploreathens.code.Site;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -52,7 +48,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -159,7 +154,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
             Log.d("radar", "Starting radar for " + drawradius + " meters");
             mMap.addCircle(new CircleOptions()
-                    .center(new LatLng(CodeUtility.getSiteCenter().latitude,  CodeUtility.getSiteCenter().longitude)) // TODO Change to curlatlong
+                    .center(new LatLng(currentLat, currentLng))
                     .radius(drawradius)
                     .strokeWidth(0f)
                     .fillColor(0x550000FF));
@@ -223,12 +218,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 mMap.setMapType(mgr.getSavedMapType());
             }
         }
-        // Task that tries to draw site markers on the map
-        // TODO check if this breaks because clientside radiuschecking is also possible
-        //String url = (CodeUtility.DRAWINRADIUS ? CodeUtility.baseURL + "/sites?radius=" + CodeUtility.DRAWRADIUS_METERS : CodeUtility.baseURL + "/sites"); // If drawinradius make radiusrequest
-
-        //if(CodeUtility.getSites().isEmpty())
-        //    new SiteRequest().execute(url);
 
         drawMarkers();
     }
@@ -237,17 +226,28 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         mMap.clear(); // Clear old markers
         markerList.clear();
         double drawradius = prefs.getInt("seek_bar_radar", 500);
+        boolean radarEnabled = prefs.getBoolean("radar_switch", false);
 
         if (mMap == null)
             return;
 
-        if(prefs.getBoolean("radar_switch", false)) // TODO CodeUtility.DRAWINRADIUS
+        if(radarEnabled)
             drawRadar();
 
         for(Site s : CodeUtility.getSites()){
-            if (CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude) < drawradius) { // TODO Change getSiteCenter with curr position
-                Log.d("radar", "Distance: " + CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude));
-                Log.d("radar", "Coords: " + s.getX() + " " + s.getY() + " " + CodeUtility.getSiteCenter().latitude + " " + CodeUtility.getSiteCenter().longitude);
+            if (radarEnabled) {
+                if(CodeUtility.haversine(s.getX(), s.getY(), currentLat, currentLng) + 250 < drawradius) {
+                    Log.d("radar", "Distance: " + CodeUtility.haversine(s.getX(), s.getY(), currentLat, currentLng));
+                    Log.d("info", "Iterating item " + s.getName());
+                    LatLng position = new LatLng(s.getX(), s.getY());
+                    MarkerOptions opt = new MarkerOptions()
+                            .title(s.getName())
+                            .position(position)
+                            .snippet(s.getDescription());
+                    Log.d("info", "Put Marker on map_menu " + opt.toString());
+                    markerList.put(s.getName(), mMap.addMarker(opt));
+                }
+            } else { // Sonst alle Marker zeichnen
                 Log.d("info", "Iterating item " + s.getName());
                 LatLng position = new LatLng(s.getX(), s.getY());
                 MarkerOptions opt = new MarkerOptions()
@@ -272,11 +272,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             public View getInfoContents (Marker arg0){
                 Site site = getSiteFromMarker(arg0);
 
-                View v = getLayoutInflater().inflate(R.layout.info_window_layout, null);
-                TextView tvTitle = v.findViewById(R.id.tvName); // TODO change these IDS
-                TextView tvDistance = v.findViewById(R.id.tvDistance);
+                View v = getLayoutInflater().inflate(R.layout.maps_site_info, null);
+                TextView tvTitle = v.findViewById(R.id.map_info_name_tv);
+                TextView tvDistance = v.findViewById(R.id.map_info_street_tv);
 
-                // TODO change this to distance or just write address?
+
                 tvDistance.setText(site.getAddress());
                 tvTitle.setText(site.getName());
 
@@ -352,7 +352,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         currentLng = location.getLongitude();
 
         if (routeShowing){
-            LatLng destination = new LatLng(0,0); // TODO fix coordinates wtf
+            LatLng destination = new LatLng(0,0); // TODO Koordinaten des Routenziels holen
 
             for(Polyline line : polylines)
                 line.remove();
@@ -366,10 +366,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 routeShowing = false;
 
                 showError("Success: You have arrived at your destination!");
-                // TODO start site activity or something
-            }else{
-                redrawRoute();
-                // TODO ???? drawRoute();
+                // start site activity
             }
         }
     }
@@ -396,24 +393,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
     }
 
-    public void redrawRoute(){
-        LatLng destination = new LatLng(0,0); // TODO you need site here
-
-        for(Polyline line : polylines)
-            line.remove();
-
-        polylines.clear();
-
-        //If you arrive to the destination
-        if(destination.longitude + 0.01 >= currentLng && destination.longitude - 0.01 <= currentLng &&
-                destination.latitude + 0.01 >= currentLat && destination.latitude - 0.01 <= currentLat){
-            //msg: you arrived to your destination
-        }else{
-            drawRoute(null); // TODO param site
-            // TODO ???? drawRoute();
-        }
-
-    }
 
     /*@Override
     public void onAttach(Context context) {
@@ -437,7 +416,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 

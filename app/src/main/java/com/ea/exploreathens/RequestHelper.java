@@ -22,7 +22,7 @@ public class RequestHelper {
             URL url = new URL(urlString);
             Log.d("connection", "Opening connection to " + url.toString());
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setConnectTimeout(10000); // TODO set timeout globally
+            httpURLConnection.setConnectTimeout(10000);
             //httpURLConnection.setChunkedStreamingMode(0);
             httpURLConnection.connect();
 

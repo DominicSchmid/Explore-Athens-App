@@ -1,23 +1,16 @@
 package com.ea.exploreathens.code;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.TextView;
 
-import com.ea.exploreathens.PostRequest;
 import com.ea.exploreathens.R;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,16 +18,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class CodeUtility {
 
@@ -44,8 +29,6 @@ public class CodeUtility {
     
     public static String NOTIFICATION_CHANNEL;
 
-    public static double DRAWRADIUS_METERS = 1000;
-    public static boolean DRAWINRADIUS = false; // TODO preferences should set this
     public static boolean firstStart = true;
     public static LatLng MAP_ZOOM_CENTER;
 
@@ -94,38 +77,6 @@ public class CodeUtility {
     }
 
     // Popup if you really want to send your location
-    public static void showSendLocation(Context context){
-        Dialog myDialog = new Dialog(context);
-        myDialog.setContentView(R.layout.send_location);
-
-        Button btnYes = myDialog.findViewById(R.id.sendLocationYesBtn);
-        Button btnNo = myDialog.findViewById(R.id.sendLocationNoBtn);
-        TextView aid = myDialog.findViewById(R.id.sendLocationAndroidIdTv);
-        TextView text = myDialog.findViewById(R.id.sendLocationTv);
-
-        String androidID = CodeUtility.getAndroidId(context);
-        LatLng position = new LatLng(24.0, 23.1); // TODO get current position
-
-
-        // TODO replace strings
-        aid.setText("Android ID: " + androidID);
-        text.setText(context.getResources().getString(R.string.send_location_confirmation) + " (" + position.latitude + " " + position.longitude + ")");
-
-
-        btnYes.setOnClickListener(e->{
-            Log.d("info", "trying to send post request from " + androidID + " at " + position);
-            PostRequest request = new PostRequest(context);
-            request.execute(androidID, ""+position.latitude, ""+position.longitude);
-
-            myDialog.dismiss();
-        });
-
-        btnNo.setOnClickListener(e->{
-            myDialog.dismiss();
-        });
-
-        myDialog.show();
-    }
 
     public static double haversine(double lat1, double lon1, double lat2, double lon2) {
         final double earthRadius = 6371; // In kilometers

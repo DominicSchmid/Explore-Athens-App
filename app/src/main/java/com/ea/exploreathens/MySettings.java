@@ -10,9 +10,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
-import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SeekBarPreference;
@@ -55,8 +55,6 @@ public class MySettings extends PreferenceFragmentCompat {
                         Intent refresh = new Intent(getContext(), MainActivity.class);
                         startActivity(refresh);
                         getActivity().finish();
-
-                        Intent intent = new Intent(getContext(), MainActivity.class);
                         getActivity().recreate();
                         return true;
                     }
@@ -100,6 +98,11 @@ public class MySettings extends PreferenceFragmentCompat {
         reqURL.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         CodeUtility.baseURL = "http://" + reqURL.getText();
 
+        SwitchPreference nightmode = (SwitchPreference) getPreferenceManager().findPreference("enable_night_mode");
+        nightmode.setOnPreferenceClickListener((pref)-> {
+                Toast.makeText(getContext(), "Coming soon...", Toast.LENGTH_SHORT).show();
+                return true;
+        });
 
         Preference button = getPreferenceManager().findPreference("send_location");
         if (button != null) {
@@ -183,33 +186,6 @@ public class MySettings extends PreferenceFragmentCompat {
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), "Deutsch"));
     }
-
-    /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
-     */
-    /*private void setupActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            // Show the Up button in the action bar.
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-    }*/
-
-
-   /* @SuppressWarnings("deprecation") // TODO this is depracated we should really fix
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class LanguagePreferenceFragment extends PreferenceFragment {
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), MySettings.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        }
-    }*/
 
     class SiteRequest extends AsyncTask< String, Void, String > {
 
