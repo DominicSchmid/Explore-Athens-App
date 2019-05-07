@@ -66,7 +66,7 @@ public class Route {
                 coordinateslist.add(new Coordinate(x, y));
             });
 
-            return new Route(summary_distance, summary_duration, steplist, coords);
+            return new Route(summary_distance, summary_duration, steplist, coordinateslist);
         } catch(Exception e) {
             e.printStackTrace();
             return null;

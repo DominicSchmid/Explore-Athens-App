@@ -30,7 +30,9 @@ import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.fragments.MapsFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MySettings extends PreferenceFragmentCompat {
+public class MySettings extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    SharedPreferences sharedPreferences;
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 
@@ -107,6 +109,9 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
         addPreferencesFromResource(R.xml.settings);
         setHasOptionsMenu(true);
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+
         Preference button = getPreferenceManager().findPreference("send_location");
         if (button != null) {
             button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -162,23 +167,11 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
         // updated to reflect the new value, per the Android Design
         // guidelines.
         bindPreferenceSummaryToValue(findPreference("language"));
-
-
     }
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
         //seekBarRadar = (SeekBarPreference) findPreference("seek_bar_radar"); //Preference Key
-    }
-
-
-    /**
-     * Helper method to determine if the device has an extra-large screen. For
-     * example, 10" tablets are extra-large.
-     */
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     /**
@@ -199,12 +192,37 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+                        .getString(preference.getKey(), "Deutsch"));
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences preference, String key) {
+        Log.d("sharedpreference", "Key: " + key);
 
+        switch(key){
+            case "seek_bar_radar":
 
+                SeekBarPreference mSeekBar = (SeekBarPreference) preference;
+                int seekBarValue = mSeekBar.getValue();
+                CodeUtility.DRAWRADIUS_KM = (double) (seekBarValue / 1000);
+                Log.d("sharedpreference", "Radius changed to " + seekBarValue);
 
+                break;
+            case "radar_switch":
+                SwitchPreference radarSW = (SwitchPreference) preference;
+                CodeUtility.DRAWINRADIUS = radarSW.isChecked();
+                Log.d("sharedpreference", "Radar status changed to " + radarSW.isChecked());
+                break;
+            case "default_get_url":
+                EditTextPreference txt = (EditTextPreference) preference;
+                if(key.equals("pref_default_get_url"))
+                    CodeUtility.baseURL = "http://" + txt.getText();
+                break;
+            case "send_location":
+
+                break;
+        }
+    }
 
 
     /**
@@ -219,7 +237,7 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
     }*/
 
 
-    @SuppressWarnings("deprecation") // TODO this is depracated we should really fix
+   /* @SuppressWarnings("deprecation") // TODO this is depracated we should really fix
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class LanguagePreferenceFragment extends PreferenceFragment {
 
@@ -232,6 +250,6 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
             }
             return super.onOptionsItemSelected(item);
         }
-    }
+    }*/
 
 }

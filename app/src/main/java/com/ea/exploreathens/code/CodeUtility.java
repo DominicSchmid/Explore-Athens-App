@@ -38,11 +38,11 @@ public class CodeUtility {
     public static DateTimeFormatter dtF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
     public static String NOTIFICATION_CHANNEL;
-    public static Fragment MapsFragment;
 
     public static double DRAWRADIUS_KM = 2.5;
     public static boolean DRAWINRADIUS = false; // TODO preferences should set this
     public static boolean firstStart = true;
+    public static LatLng MAP_ZOOM_CENTER;
 
     private static ArrayList<Site> sites = new ArrayList<>();
     //public static String baseURL = "http://192.168.43.50:5000";
@@ -211,6 +211,27 @@ public class CodeUtility {
                 return s;
         }
         return null;
+    }
+
+    public static LatLng getSiteCenter(){
+        if(MAP_ZOOM_CENTER != null)
+            return MAP_ZOOM_CENTER;
+
+        double x = 0, y = 0;
+        double avgX, avgY;
+
+        if(sites != null){
+            for(Site s : sites){
+                x += s.getX();
+                y += s.getY();
+            }
+
+            avgX = x / sites.size();
+            avgY = y / sites.size();
+            return new LatLng(avgX, avgY);
+        }
+
+        return new LatLng(37.9724132, 23.7300487);
     }
 
 

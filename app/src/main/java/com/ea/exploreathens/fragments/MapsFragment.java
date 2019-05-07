@@ -20,9 +20,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.ea.exploreathens.MainActivity;
+import com.ea.exploreathens.MapStateManager;
 import com.ea.exploreathens.MySettings;
 import com.ea.exploreathens.R;
 import com.ea.exploreathens.RequestHelper;
@@ -31,6 +33,7 @@ import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.code.Coordinate;
 import com.ea.exploreathens.code.Route;
 import com.ea.exploreathens.code.Site;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -57,23 +60,17 @@ import java.util.concurrent.Executors;
  */
 public class MapsFragment extends Fragment implements OnMapReadyCallback, LocationListener {
 
-
-    private OnFragmentInteractionListener mListener;
-
-    private MapView mapView;
     private GoogleMap mMap;
+    private static final double ZOOM_ATHENS = 14;
+    private boolean routeShowing = false;
+
     private LocationManager locationManager;
     public static String provider;
+
     public static double currentLat = 0, currentLng = 0;
-    private boolean drawPolyline;
-    private List<Polyline> polylines = new ArrayList<Polyline>();
 
-    private static final double ZOOM_ATHENS = 14;
-    private static final LatLng ATHENS_LAT_LNG = new LatLng(37.9724132, 23.7300487);
+    private List<Polyline> polylines = new ArrayList<>();
     public static HashMap<String, Marker> markerList = new HashMap<>();
-
-
-
 
 
     public MapsFragment() {
@@ -84,7 +81,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
+        //setRetainInstance(true);
 
         Bundle args = this.getArguments();
         if (args != null) {
@@ -94,11 +91,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
             Site s = CodeUtility.getSiteByName(myValue);
             RouteRequest req = new RouteRequest();
-            req.execute(CodeUtility.baseURL + "/route/" + currentLat + "," + currentLng + "/" + s.getX() + "," + s.getY());
+            req.execute(CodeUtility.baseURL + "/route/" + currentLng + "," + currentLat + "/" + s.getY() + "," + s.getX());
         }
 
+        // Make site request if sites are not loaded yet. Just in case..
         if(CodeUtility.getSites() == null)
             new SiteRequest().execute(CodeUtility.baseURL + "/sites");
+
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(new Criteria(), false);
+    }
+
+    private void setupMapIfNeeded() {
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        if (mMap == null) {
+            SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                    .findFragmentById(R.id.google_map);
+            mapFragment.getMapAsync(this);
+        }
     }
 
     @Override
@@ -107,21 +117,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         // Inflate the layout for this fragment
         View wView = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.google_map);
-
-        Log.d("map", "Map Fragment " + mapFragment);
-        mapFragment.getMapAsync(this);
-
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-        Criteria criteria = new Criteria();
-        provider = locationManager.getBestProvider(criteria, false);
-
         @SuppressLint("MissingPermission") Location location = locationManager.getLastKnownLocation(provider);
         if (location != null)
             onLocationChanged(location);
 
+        setupMapIfNeeded();
         return wView;
     }
 
@@ -149,9 +149,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
     public void drawRadar(double meter) {
         if (mMap != null) {
-            CircleOptions radarCircle;
-            mMap.addCircle(radarCircle = new CircleOptions()
-                    .center(ATHENS_LAT_LNG)
+            mMap.addCircle(new CircleOptions()
+                    .center(CodeUtility.getSiteCenter())
                     .radius(meter)
                     .strokeWidth(0f)
                     .fillColor(0x550000FF));
@@ -159,7 +158,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             //TODO: change ATHENS_LAT_LNG with position
 
             for (Site s : CodeUtility.getSites()) {
-                if (CodeUtility.haversine(s.getX(), s.getY(), ATHENS_LAT_LNG.latitude, ATHENS_LAT_LNG.longitude) > meter) {
+                if (CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude) > meter) {
                     markerList.get(s.getName()).remove();
                 }
             }
@@ -174,7 +173,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
      * @param arg0 The Marker
      * @return the Site object for the coordinates of the Marker
      */
-
     private Site getSiteFromMarker(Marker arg0) {
         LatLng latLng = arg0.getPosition();
         Site site = null;
@@ -191,36 +189,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         return null;
     }
 
-    public void drawSiteMarkers() {
-        /* TODO Am Anfang sollen alle Sites angezeigt werden, die wir kennen
-        TODO Durch einen Button / Menüeintrag sollen dann nur noch die Sites im gewählten Radius angezeigt werden, dann könnte man
-        TODO auch die Entfernung dazuschreiben wenn das nicht zu viel Arbeit wird
-         */
-
-
-    }
-
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if(CodeUtility.firstStart) {
+            CameraPosition athens = new CameraPosition.Builder().target(CodeUtility.getSiteCenter()).zoom((float) ZOOM_ATHENS).build();
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(athens));
+            CodeUtility.firstStart = false;
+        } else {
+            MapStateManager mgr = new MapStateManager(getContext());
+            CameraPosition position = mgr.getSavedCameraPosition();
+            if (position != null) {
+                CameraUpdate update = CameraUpdateFactory.newCameraPosition(position);
+
+                mMap.moveCamera(update);
+                mMap.setMapType(mgr.getSavedMapType());
+            }
+        }
         // Task that tries to draw site markers on the map
         // TODO check if this breaks because clientside radiuschecking is also possible
         String url = (CodeUtility.DRAWINRADIUS ? CodeUtility.baseURL + "/sites?radius=" + CodeUtility.DRAWRADIUS_KM : CodeUtility.baseURL + "/sites"); // If drawinradius make radiusrequest
 
-        if(CodeUtility.getSites().isEmpty()){
-            SiteRequest req = new SiteRequest();
-            req.execute(url);
-        }
+        if(CodeUtility.getSites().isEmpty())
+            new SiteRequest().execute(url);
 
-        //drawRadar(100.0);
-        LatLng position = new LatLng(currentLat, currentLng);
-
-        if(CodeUtility.firstStart) {
-            CameraPosition athens = new CameraPosition.Builder().target(ATHENS_LAT_LNG).zoom((float) ZOOM_ATHENS).build();
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(athens));
-            CodeUtility.firstStart = false;
-        }
         mMap.setMyLocationEnabled(true);
 
         drawMarkers();
@@ -249,7 +243,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         // This inflates the info window when you click on a Marker
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter(){
             @Override
-                public View getInfoWindow (Marker arg0){
+            public View getInfoWindow (Marker arg0){
                 return null;
             }
 
@@ -269,6 +263,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             }
         });
     }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        if(mMap != null) {
+            MapStateManager mgr = new MapStateManager(getContext());
+            mgr.saveMapState(mMap);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setupMapIfNeeded();
+    }
+
 
     class InfoClickListener implements GoogleMap.OnInfoWindowClickListener {
 
@@ -313,16 +323,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         return false;
     }
 
-
     // If the phone location is changed it will change the latitude and longitude of the variable location
     @Override
     public void onLocationChanged(Location location) {
         currentLat = location.getLatitude();
         currentLng = location.getLongitude();
 
-        //TODO: Make request , get destination Coordinates
-        if (drawPolyline){
-            LatLng destination = new LatLng(0,0);
+        if (routeShowing){
+            LatLng destination = new LatLng(0,0); // TODO fix coordinates wtf
 
             for(Polyline line : polylines)
                 line.remove();
@@ -333,6 +341,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             if(destination.longitude + 0.01 >= location.getLongitude() && destination.longitude - 0.01 <= location.getLongitude() &&
                     destination.latitude + 0.01 >= location.getLatitude() && destination.latitude - 0.01 <= location.getLatitude()){
                 //msg: you arrived to your destination
+                routeShowing = false;
+
+                showError("Success: You have arrived at your destination!");
+                // TODO start site activity or something
             }else{
                 redrawRoute();
                 // TODO ???? drawRoute();
@@ -340,28 +352,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         }
     }
 
-
-
-
-
-
-
-
     //Just "must have" methods
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
 
     @Override
-    public void onProviderEnabled(String provider) {
-
-    }
+    public void onProviderEnabled(String provider) {}
 
     @Override
-    public void onProviderDisabled(String provider) {
-
-    }
+    public void onProviderDisabled(String provider) {}
 
 
     public void drawRoute(Route route){
@@ -371,7 +370,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         if (mMap != null) {
             for (Coordinate c : coordinatesList) {
                 //get current coordinates with LatLngNext
-                LatLng latLngNext = new LatLng(c.getX(), c.getY());
+                LatLng latLngNext = new LatLng(c.getY(), c.getX());
 
                 polylines.add(mMap.addPolyline((new PolylineOptions())
                         .add(latLngPrevious, latLngNext)
@@ -401,13 +400,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             // TODO ???? drawRoute();
         }
 
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     /*@Override
@@ -487,6 +479,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 // Otherwise a request to /sites must return AL<Site> so you can just cast
                 Route route = (Route) obj;
                 this.route = route;
+
+                routeShowing = true;
                 drawRoute(route);
 
                 Log.d("json-route", route.toString());
