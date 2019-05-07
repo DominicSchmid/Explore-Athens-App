@@ -147,7 +147,7 @@ public class SiteListFragment extends Fragment {
 
     public void updateSites(){
         Log.d("info", "updating sites...");
-        new SiteRequest().execute(CodeUtility.baseURL + "/sites"); // TODO put coordinates in request?
+        new SiteRequest().execute(CodeUtility.baseURL + "/sites?lan=" + CodeUtility.getLocale(getContext())); // TODO put coordinates in request?
     }
 
     private void createNotificationChannel(String name) {
@@ -166,7 +166,6 @@ public class SiteListFragment extends Fragment {
             CodeUtility.NOTIFICATION_CHANNEL = name;
         }
     }
-
 
     public void setSites(ArrayList<Site> sites) {
         // Called after a GET request for sites gets the result

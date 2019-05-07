@@ -17,7 +17,7 @@
     <string-array name="pref_language_values">
         <item>en</item>
         <item>de</item>
-        <item>di</item>
+        <item>it</item>
     </string-array>
     <string name="pref_enable_radar">Nur Sehenswürdigkeiten in Radius zeigen</string>
     <string name="pref_night_mode">Nachtmodus</string>

@@ -86,9 +86,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         setHasOptionsMenu(true);
         //setRetainInstance(true);
 
+        String language = CodeUtility.getLocale(getContext());
         // Make site request if sites are not loaded yet. Just in case..
         if(CodeUtility.getSites().isEmpty())
-            new SiteRequest().execute(CodeUtility.baseURL + "/sites");
+            new SiteRequest().execute(CodeUtility.baseURL + "/sites?lan=" + language);
 
         Bundle args = this.getArguments();
         if (args != null) {
@@ -162,21 +163,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                     .radius(drawradius)
                     .strokeWidth(0f)
                     .fillColor(0x550000FF));
-
-            if(CodeUtility.getSites().isEmpty()){
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            for (Site s : CodeUtility.getSites()) {
-                Log.d("radar", "Coords for " + s.getName() + ": " + s.getX() + " " +  s.getY() + " " + CodeUtility.getSiteCenter().latitude + " " +  CodeUtility.getSiteCenter().longitude + " - HAVERSINE: " + CodeUtility.haversine(s.getX(), s.getY(),  CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude));
-                if (CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude) > drawradius) { // TODO Change getSiteCenter with curr position
-                    markerList.get(s.getName()).remove();
-                }
-            }
         }
 
     }
@@ -211,12 +197,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         mMap.setMyLocationEnabled(true);
 
 
+        if(CodeUtility.getSites().isEmpty()) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+        }
 
 
         if(CodeUtility.firstStart) {
@@ -244,26 +231,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         //    new SiteRequest().execute(url);
 
         drawMarkers();
-        if(prefs.getBoolean("radar_switch", false)) // TODO CodeUtility.DRAWINRADIUS
-            drawRadar();
     }
 
     public void drawMarkers(){
         mMap.clear(); // Clear old markers
         markerList.clear();
+        double drawradius = prefs.getInt("seek_bar_radar", 500);
 
         if (mMap == null)
             return;
 
+        if(prefs.getBoolean("radar_switch", false)) // TODO CodeUtility.DRAWINRADIUS
+            drawRadar();
+
         for(Site s : CodeUtility.getSites()){
-            Log.d("info", "Iterating item " + s.getName());
-            LatLng position = new LatLng(s.getX(), s.getY());
-            MarkerOptions opt = new MarkerOptions()
-                    .title(s.getName())
-                    .position(position)
-                    .snippet(s.getDescription());
-            Log.d("info", "Put Marker on map_menu " + opt.toString());
-            markerList.put(s.getName(), mMap.addMarker(opt));
+            if (CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude) < drawradius) { // TODO Change getSiteCenter with curr position
+                Log.d("radar", "Distance: " + CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude));
+                Log.d("radar", "Coords: " + s.getX() + " " + s.getY() + " " + CodeUtility.getSiteCenter().latitude + " " + CodeUtility.getSiteCenter().longitude);
+                Log.d("info", "Iterating item " + s.getName());
+                LatLng position = new LatLng(s.getX(), s.getY());
+                MarkerOptions opt = new MarkerOptions()
+                        .title(s.getName())
+                        .position(position)
+                        .snippet(s.getDescription());
+                Log.d("info", "Put Marker on map_menu " + opt.toString());
+                markerList.put(s.getName(), mMap.addMarker(opt));
+            }
         }
 
         mMap.setOnInfoWindowClickListener(new InfoClickListener());
