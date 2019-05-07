@@ -3,6 +3,7 @@ package com.ea.exploreathens.fragments;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -72,6 +74,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     private List<Polyline> polylines = new ArrayList<>();
     public static HashMap<String, Marker> markerList = new HashMap<>();
 
+    private SharedPreferences prefs;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -98,8 +101,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             req.execute(CodeUtility.baseURL + "/route/" + currentLng + "," + currentLat + "/" + s.getY() + "," + s.getX());
         }
 
-
-
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         provider = locationManager.getBestProvider(new Criteria(), false);
     }
@@ -124,6 +125,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
             onLocationChanged(location);
 
         setupMapIfNeeded();
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         return wView;
     }
 
@@ -151,10 +154,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
     public void drawRadar() {
         if (mMap != null) {
-            Log.d("radar", "Trying to radar");
+            double drawradius = prefs.getInt("seek_bar_radar", 500);
+
+            Log.d("radar", "Starting radar for " + drawradius + " meters");
             mMap.addCircle(new CircleOptions()
-                    .center(new LatLng(CodeUtility.getSiteCenter().latitude,  CodeUtility.getSiteCenter().longitude))
-                    .radius(CodeUtility.DRAWRADIUS_METERS)
+                    .center(new LatLng(CodeUtility.getSiteCenter().latitude,  CodeUtility.getSiteCenter().longitude)) // TODO Change to curlatlong
+                    .radius(drawradius)
                     .strokeWidth(0f)
                     .fillColor(0x550000FF));
 
@@ -168,7 +173,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
             for (Site s : CodeUtility.getSites()) {
                 Log.d("radar", "Coords for " + s.getName() + ": " + s.getX() + " " +  s.getY() + " " + CodeUtility.getSiteCenter().latitude + " " +  CodeUtility.getSiteCenter().longitude + " - HAVERSINE: " + CodeUtility.haversine(s.getX(), s.getY(),  CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude));
-                if (CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude) > CodeUtility.DRAWRADIUS_METERS) { // TODO Change getSiteCenter with curr position
+                if (CodeUtility.haversine(s.getX(), s.getY(), CodeUtility.getSiteCenter().latitude, CodeUtility.getSiteCenter().longitude) > drawradius) { // TODO Change getSiteCenter with curr position
                     markerList.get(s.getName()).remove();
                 }
             }
@@ -205,13 +210,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         mMap = googleMap;
         mMap.setMyLocationEnabled(true);
 
-        if(CodeUtility.getSites().isEmpty()){
+
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
+
+
 
         if(CodeUtility.firstStart) {
             Log.d("info", "First start detected: Zooming into " + CodeUtility.getSiteCenter().toString());
@@ -238,7 +244,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         //    new SiteRequest().execute(url);
 
         drawMarkers();
-        if(true) // TODO CodeUtility.DRAWINRADIUS
+        if(prefs.getBoolean("radar_switch", false)) // TODO CodeUtility.DRAWINRADIUS
             drawRadar();
     }
 
@@ -475,12 +481,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 e.printStackTrace();
                 //String err = (e.getMessage() == null) ? "SD Card failed" : e.getMessage();
                 //og.e("connection-error", ""+err);
-                return "Oh no, an error occured :(";
+                return  "The operation can not be performed on the selected server (" + CodeUtility.baseURL + ")";
             }
         }
 
         @Override
         protected void onPostExecute(String response){
+            if(getContext() == null)
+                return;
+
             Object obj = CodeUtility.getJSON(contentType, response);
 
             if(obj instanceof String) {
@@ -530,13 +539,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
                 e.printStackTrace();
                 //String err = (e.getMessage() == null) ? "SD Card failed" : e.getMessage();
                 //og.e("connection-error", ""+err);
-                return "Oh no, an error occured :(";
+                return "The operation can not be performed on the selected server (" + CodeUtility.baseURL + ")";
             }
 
         }
 
         @Override
         protected void onPostExecute(String response){
+            if(getContext() == null)
+                return;
+
             Object obj = CodeUtility.getJSON(contentType, response);
 
             if(obj instanceof String) {

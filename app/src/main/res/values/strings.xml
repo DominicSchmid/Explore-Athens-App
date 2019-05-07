@@ -15,9 +15,9 @@
         <item>Dialekt</item>
     </string-array>
     <string-array name="pref_language_values">
-        <item>Eng</item>
-        <item>Deu</item>
-        <item>Dia</item>
+        <item>en</item>
+        <item>de</item>
+        <item>di</item>
     </string-array>
     <string name="pref_enable_radar">Nur Sehenswürdigkeiten in Radius zeigen</string>
     <string name="pref_night_mode">Nachtmodus</string>

@@ -284,13 +284,16 @@ public class SiteListFragment extends Fragment {
                 e.printStackTrace();
                 //String err = (e.getMessage() == null) ? "SD Card failed" : e.getMessage();
                 //og.e("connection-error", ""+err);
-                return "Oh no, an error occured :(";
+                return "The operation can not be performed on the selected server (" + CodeUtility.baseURL + ")";
             }
 
         }
 
         @Override
         protected void onPostExecute(String response){
+            if(getContext() == null)
+                return;
+
             Object obj = CodeUtility.getJSON(contentType, response);
 
             if(obj instanceof String) {

@@ -1,17 +1,9 @@
 package com.ea.exploreathens;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.location.Location;
-import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import android.support.v14.preference.SwitchPreference;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.ListPreference;
@@ -21,83 +13,40 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.SeekBarPreference;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.SeekBar;
+import android.widget.Toast;
 
 import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.fragments.MapsFragment;
-import com.google.android.gms.maps.model.LatLng;
 
-public class MySettings extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MySettings extends PreferenceFragmentCompat {
 
     SharedPreferences sharedPreferences;
 
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+    private Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
+
             String stringValue = value.toString();
-            String key = preference.getKey();
-
-
-            Log.d("preference", "Key: " + key);
-
-            switch(key){
-                case "seek_bar_radar":
-
-                    SeekBarPreference mSeekBar = (SeekBarPreference) preference;
-                    int seekBarValue = mSeekBar.getValue();
-                    CodeUtility.DRAWRADIUS_METERS = (double) seekBarValue;
-                    Log.d("preference", "Radius changed to " + seekBarValue);
-
-                    break;
-                case "radar_switch":
-                    SwitchPreference radarSW = (SwitchPreference) preference;
-                    CodeUtility.DRAWINRADIUS = radarSW.isChecked();
-                    Log.d("preference", "Radar status changed to " + radarSW.isChecked());
-                    break;
-                case "default_get_url":
-                    EditTextPreference txt = (EditTextPreference) preference;
-                    if(key.equals("pref_default_get_url"))
-                        CodeUtility.baseURL = "http://" + txt.getText();
-                    break;
-                case "send_location":
-
-                    break;
-            }
-
-
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
                 ListPreference listPreference = (ListPreference) preference;
                 int index = listPreference.findIndexOfValue(stringValue);
-
                 // Set the summary to reflect the new value.
-                preference.setSummary(
-                        index >= 0
-                                ? listPreference.getEntries()[index]
-                                : null);
+                preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
+            } else if(preference instanceof SwitchPreference){ // Otherwise it has to be the show radar togglebutton
+                SwitchPreference radarSW = (SwitchPreference) preference;
 
-            } else {
-
-                // TODO if prefence is switchbutton for radar
-/*
-I glab es isch folsch wenn man probiert in do AppCompactSettingsActivity irgendwelche settings zu ändern
-Iwo isch gstonn dass es depracated isch und man fragments benutzen soll deswegen geats wenn mo unten
-in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
- */
-                if(preference.isEnabled()){
-
-                    //getPreferenceScreen().findPreference("list box preference key").setEnabled(isEnabled);
-                    //getPreferenceScreen().findPreference("list box preference key").setEnabled(!isEnabled);
-                }
-
-                // For all other preferences, set the summary to the values
-                // simple string representation.
-                preference.setSummary(stringValue);
+                SeekBarPreference seekBarRadar = (SeekBarPreference) findPreference("seek_bar_radar"); //Preference Key
+                seekBarRadar.setVisible(!radarSW.isChecked());
+            } else if(preference instanceof  EditTextPreference){
+                EditTextPreference url = (EditTextPreference) preference;
+                String newURL = "http://" + url.getText();
+                if(!CodeUtility.baseURL.equals(newURL))
+                    Toast.makeText(getContext(), "API URL updated to " + newURL, Toast.LENGTH_LONG).show();
+                CodeUtility.baseURL = newURL;
+                Log.d("preference", "Updated base url to " + newURL);
             }
             return true;
         }
@@ -110,6 +59,29 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
         setHasOptionsMenu(true);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        // Set defaults
+        SwitchPreference radarSW = (SwitchPreference) getPreferenceManager().findPreference("radar_switch");
+        radarSW.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+
+        SeekBarPreference seekBarRadar = (SeekBarPreference) findPreference("seek_bar_radar"); //Preference Key
+        seekBarRadar.setVisible(radarSW.isChecked());
+
+        EditTextPreference reqURL = (EditTextPreference) getPreferenceManager().findPreference("default_get_url");
+        reqURL.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                String newURL = "http://" + o.toString();
+                Log.d("preference", "Base url to " + newURL);
+                if(!CodeUtility.baseURL.equals(newURL)) {
+                    Toast.makeText(getContext(), "API URL updated to " + newURL, Toast.LENGTH_LONG).show();
+                    CodeUtility.baseURL = newURL;
+                }
+                return true;
+            }
+        });
+        CodeUtility.baseURL = "http://" + reqURL.getText();
+
 
         Preference button = getPreferenceManager().findPreference("send_location");
         if (button != null) {
@@ -182,7 +154,7 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
      *
      * @see #sBindPreferenceSummaryToValueListener
      */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
+    private void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
@@ -193,36 +165,6 @@ in fragment des mitn Slider mochn obo es geat net wenn mans do probiert.
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), "Deutsch"));
     }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences preference, String key) {
-        Log.d("sharedpreference", "Key: " + key);
-
-        switch(key){
-            case "seek_bar_radar":
-
-                SeekBarPreference mSeekBar = (SeekBarPreference) preference;
-                int seekBarValue = mSeekBar.getValue();
-                CodeUtility.DRAWRADIUS_METERS = (double) seekBarValue;
-                Log.d("sharedpreference", "Radius changed to " + seekBarValue);
-
-                break;
-            case "radar_switch":
-                SwitchPreference radarSW = (SwitchPreference) preference;
-                CodeUtility.DRAWINRADIUS = radarSW.isChecked();
-                Log.d("sharedpreference", "Radar status changed to " + radarSW.isChecked());
-                break;
-            case "default_get_url":
-                EditTextPreference txt = (EditTextPreference) preference;
-                if(key.equals("pref_default_get_url"))
-                    CodeUtility.baseURL = "http://" + txt.getText();
-                break;
-            case "send_location":
-
-                break;
-        }
-    }
-
 
     /**
      * Set up the {@link android.app.ActionBar}, if the API is available.

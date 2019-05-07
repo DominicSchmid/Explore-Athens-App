@@ -171,7 +171,6 @@ public class WeatherFragment extends Fragment {
                 RequestHelper helper = new RequestHelper();
                 helper.getRequestContent(urls[0]);
                 contentType = helper.responseType;
-
                 Log.d("json-response", helper.responseContent);
                 Log.d("json-responsetype", helper.responseType);
                 Log.d("json-responsecode", ""+helper.responseCode);
@@ -187,6 +186,9 @@ public class WeatherFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String response){
+            if(getContext() == null)
+                return;
+
             Object obj = CodeUtility.getJSON(contentType, response);
 
             if(obj instanceof String) {

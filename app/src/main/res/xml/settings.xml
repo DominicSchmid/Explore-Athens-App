@@ -17,7 +17,7 @@
         <SeekBarPreference
             android:defaultValue="2500"
             android:max="5000"
-            android:title="Show sites within range (m): "
+            android:title="Radius (m)"
             android:key="seek_bar_radar">
         </SeekBarPreference>
 

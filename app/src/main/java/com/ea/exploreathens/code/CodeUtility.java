@@ -1,14 +1,18 @@
 package com.ea.exploreathens.code;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
@@ -30,6 +34,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class CodeUtility {
 
@@ -48,6 +53,7 @@ public class CodeUtility {
     //public static String baseURL = "http://192.168.43.50:5000";
     //public static String baseURL = "http://192.168.1.18:5000";
   // public static String baseURL = "http://10.171.152.230:5000";
+
     public static String baseURL = "http://185.5.199.33:5053";
     public static String basePostURL = "http://185.5.199.33:5051";
 
@@ -60,8 +66,13 @@ public class CodeUtility {
             Manifest.permission.ACCESS_FINE_LOCATION};
 
     private CodeUtility(){
+        // Private constructor
+    }
 
-
+    public static String getLocale(Context ctx){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+        Log.d("preference", "Locale found: " +  prefs.getString("language", "de"));
+        return prefs.getString("language", "de");
     }
 
     public static synchronized void setSites(ArrayList<Site> sites){
@@ -223,7 +234,7 @@ public class CodeUtility {
         double x = 0, y = 0;
         double avgX, avgY;
 
-        if(sites != null){
+        if(!sites.isEmpty()){
             for(Site s : sites){
                 x += s.getX();
                 y += s.getY();

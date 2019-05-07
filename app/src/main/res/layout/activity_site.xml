@@ -23,11 +23,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:backgroundTint="#004D2323"
+        app:backgroundTint="@android:color/background_light"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:rippleColor="@android:color/holo_green_light"
-        app:srcCompat="@drawable/ic_home_black_24dp"
+        app:rippleColor="#004D2323"
+        app:srcCompat="@drawable/ic8_search"
         />
 
 </android.support.constraint.ConstraintLayout>
