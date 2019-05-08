@@ -25,7 +25,7 @@ public class ExpandableWeatherAdapter extends BaseExpandableListAdapter {
     public ExpandableWeatherAdapter(Context ctx, WeatherForecast forecast){
         this.context = ctx;
         this.childList = forecast.getForecastSplitByDays();
-        this.parents = forecast.getDayNames();
+        this.parents = forecast.getDayNames(context);
 
         Log.d("weather", "Initialized Expandable Adapter with " + childList.size() + " children and divided into '" + parents.toString()  + "'");
     }
@@ -72,9 +72,6 @@ public class ExpandableWeatherAdapter extends BaseExpandableListAdapter {
 
         TextView parentTv = convertView.findViewById(R.id.weatherlistParentDayTv);
         parentTv.setText(parents.get(groupPosition));
-
-        if(groupPosition == 0)
-            parentTv.setText("TODAY");
 
         TextView parentAvgTemp = convertView.findViewById(R.id.weatherlistParentAvgTemp);
         if(groupPosition < childList.size())

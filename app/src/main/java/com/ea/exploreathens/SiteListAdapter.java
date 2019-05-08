@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.code.Site;
+import com.ea.exploreathens.fragments.MapsFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -69,17 +71,19 @@ public class SiteListAdapter extends ArrayAdapter<Site> {
 
         TextView address = listItem.findViewById(R.id.sitelistStreetTv);
         String street = site.getAddress();
-        if(street.length() > 40)
+        if(street.length() > 30)
             street = street.substring(0, 40-3) + "...";
 
         address.setText(street);
-
+        Log.d("distance", "Current position: " + CodeUtility.curlat + " " + CodeUtility.curlng + " " + site.getX() + " " + site.getY());
         TextView distance = listItem.findViewById(R.id.sitelistDistanceTv);
-        double dist = site.getDistance();
 
-        if(dist < 0) {
+        double dist = CodeUtility.haversine(CodeUtility.curlat, CodeUtility.curlng, site.getX(), site.getY()) / 1000;
+        Log.d("distance", site.getName() + ": "+dist);
+        if(dist > 0 && dist < 10000 * 1000) { // Entfernung nicht mehr als 3000 km
             distance.setVisibility(View.VISIBLE);
-            distance.setText(dist + "km");
+            distance.setText(String.format("%.2f", dist) + " km");
+            site.setDistance(dist);
         } else
             distance.setVisibility(View.INVISIBLE);
 

@@ -1,11 +1,15 @@
 package com.ea.exploreathens.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -78,6 +82,16 @@ public class SiteListFragment extends Fragment {
             ContextWrapper cw = new ContextWrapper(getContext());
             try {
                 FileUtils.deleteDirectory(cw.getDir("siteImages", Context.MODE_PRIVATE));
+
+                // UPDATE LOCATION
+                LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                String provider = locationManager.getBestProvider(new Criteria(), false);
+
+                @SuppressLint("MissingPermission") Location location = locationManager.getLastKnownLocation(provider);
+                if (location != null){
+                    CodeUtility.curlat = location.getLatitude();
+                    CodeUtility.curlng = location.getLongitude();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

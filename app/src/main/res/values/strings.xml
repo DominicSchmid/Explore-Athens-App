@@ -77,4 +77,16 @@
     <string name="pref_default_post_url">URL für Standort senden</string>
     <string name="show_android_id">Android ID anzeigen</string>
 
+    <!-- Weekdays -->
+    <string name="today">Heute</string>
+    <string name="monday">Montag</string>
+    <string name="tuesday">Dienstag</string>
+    <string name="wednesday">Mittwoch</string>
+    <string name="thursday">Donnerstag</string>
+    <string name="friday">Freitag</string>
+    <string name="saturday">Samstag</string>
+    <string name="sunday">Sonntag</string>
+    <string name="route_calculating">Route wird berechnet...</string>
+
+
 </resources>

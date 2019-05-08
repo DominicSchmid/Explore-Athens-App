@@ -1,6 +1,7 @@
 package com.ea.exploreathens.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -194,12 +195,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
         if(CodeUtility.getSites().isEmpty()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(700);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
 
         if(CodeUtility.firstStart) {
             Log.d("info", "First start detected: Zooming into " + CodeUtility.getSiteCenter().toString());
@@ -289,6 +289,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     public void onPause(){
         super.onPause();
         if(mMap != null) {
+            CodeUtility.curlat = currentLat;
+            CodeUtility.curlng = currentLng;
+
             MapStateManager mgr = new MapStateManager(getContext());
             mgr.saveMapState(mMap);
         }
@@ -299,6 +302,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
     public void onResume() {
         super.onResume();
         setupMapIfNeeded();
+        getActivity().setTitle(getResources().getString(R.string.title_maps));
     }
 
 
@@ -351,6 +355,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
         currentLat = location.getLatitude();
         currentLng = location.getLongitude();
 
+        CodeUtility.curlat = currentLat;
+        CodeUtility.curlng = currentLng;
+
         if (routeShowing){
             LatLng destination = new LatLng(0,0); // TODO Koordinaten des Routenziels holen
 
@@ -381,6 +388,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Locati
 
                 //get current coordinates with LatLngNext
                 LatLng latLngNext = new LatLng(c.getY(), c.getX());
+
+               /* for(Polyline line : polylines)
+                    line.remove();
+
+                polylines.clear();*/
 
                 polylines.add(mMap.addPolyline((new PolylineOptions())
                         .add(latLngPrevious, latLngNext)

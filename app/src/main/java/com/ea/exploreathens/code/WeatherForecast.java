@@ -1,5 +1,10 @@
 package com.ea.exploreathens.code;
 
+import android.content.Context;
+import android.util.Log;
+
+import com.ea.exploreathens.R;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -7,6 +12,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WeatherForecast {
 
@@ -69,7 +76,7 @@ public class WeatherForecast {
         }
     }
 
-    public ArrayList<String> getDayNames(){
+    public ArrayList<String> getDayNames(Context ctx){
         ArrayList<String> dates = new ArrayList<>();
 
         for(int i = 0; i < forecast.size(); i++){
@@ -78,7 +85,48 @@ public class WeatherForecast {
                 dates.add(day);
         }
 
-        return dates;
+        Map<String, String> weekdays = new HashMap<>();
+
+        ArrayList<String> localeDays = new ArrayList<>();
+
+        for(String s : dates){
+            int id;
+            s = s.toLowerCase();
+            Log.d("weekday", "Changing " + s);
+            switch(s) {
+                case "monday":
+                    id = R.string.monday;
+                    break;
+                case "tuesday":
+                    id = R.string.tuesday;
+                    break;
+                case "wednesday":
+                    id = R.string.wednesday;
+                    break;
+                case "thursday":
+                    id = R.string.thursday;
+                    break;
+                case "friday":
+                    id = R.string.friday;
+                    break;
+                case "saturday":
+                    id = R.string.saturday;
+                    break;
+                case "sunday":
+                    id = R.string.sunday;
+                    break;
+                default:
+                    id = R.string.today;
+                    break;
+            }
+            localeDays.add(ctx.getResources().getString(id));
+        }
+
+        localeDays.set(0, ctx.getResources().getString(R.string.today)); // Display today instead of weekday
+
+        Log.d("weekdays", "Localedays: " + localeDays.toString());
+
+        return localeDays;
     }
 
     public ArrayList<ArrayList<Weather>> getForecastSplitByDays(){

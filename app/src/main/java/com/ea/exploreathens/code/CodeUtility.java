@@ -20,6 +20,8 @@ import org.json.simple.parser.JSONParser;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CodeUtility {
 
@@ -31,6 +33,8 @@ public class CodeUtility {
 
     public static boolean firstStart = true;
     public static LatLng MAP_ZOOM_CENTER;
+    public static double curlat = 0;
+    public static double curlng = 0;
 
     private static ArrayList<Site> sites = new ArrayList<>();
     //public static String baseURL = "http://192.168.43.50:5000";
@@ -198,7 +202,5 @@ public class CodeUtility {
 
         return new LatLng(37.9724132, 23.7300487);
     }
-
-
 
 }

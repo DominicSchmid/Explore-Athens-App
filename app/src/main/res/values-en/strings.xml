@@ -57,4 +57,15 @@
     <string name="pref_default_get_url">URL for REST API</string>
     <string name="pref_default_post_url">URL for sending location</string>
     <string name="show_android_id">Show Android ID</string>
+
+    <!-- Weekdays -->
+    <string name="today">Today</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="route_calculating">Route is being calculated...</string>
 </resources>

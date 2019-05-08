@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.code.Site;
@@ -37,7 +38,11 @@ public class SiteActivity extends AppCompatActivity {
             ImageAdapter imageAdapter = new ImageAdapter(this, site.getImageRequestPaths());
             viewPager.setAdapter(imageAdapter);
 
-            name.setText(site.getName());
+            double dist = site.getDistance();
+            if(dist > 0 && dist < 5000 * 1000)
+                name.setText(site.getName() + " (" + String.format("%.2f", dist) + " km)");
+            else
+                name.setText(site.getName());
             address.setText(site.getAddress());
             description.setText(site.getDescription());
         }
@@ -47,6 +52,8 @@ public class SiteActivity extends AppCompatActivity {
             Intent resultIntent = new Intent();
             resultIntent.putExtra("routeTo", site.getName()); // Returns routeTo - sitename to the parent activity
             setResult(Activity.RESULT_OK, resultIntent);
+
+            Toast.makeText(this, getResources().getString(R.string.route_calculating) + " (" + String.format("%.2f", site.getDistance()) + " km)", Toast.LENGTH_LONG).show();
 
             finish();
         });
