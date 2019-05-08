@@ -14,8 +14,6 @@ import android.widget.TextView;
 
 import com.ea.exploreathens.code.CodeUtility;
 import com.ea.exploreathens.code.Site;
-import com.ea.exploreathens.fragments.MapsFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -72,7 +70,7 @@ public class SiteListAdapter extends ArrayAdapter<Site> {
         TextView address = listItem.findViewById(R.id.sitelistStreetTv);
         String street = site.getAddress();
         if(street.length() > 30)
-            street = street.substring(0, 40-3) + "...";
+            street = street.substring(0, 30-3) + "...";
 
         address.setText(street);
         Log.d("distance", "Current position: " + CodeUtility.curlat + " " + CodeUtility.curlng + " " + site.getX() + " " + site.getY());
